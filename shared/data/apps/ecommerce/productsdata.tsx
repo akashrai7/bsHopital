@@ -1,0 +1,368 @@
+interface ProductInfo {
+    id: number;
+    productpicture: string;
+    title: string;
+    status: string;
+    class: string;
+    rating: string;
+    price: string;
+    discount: string;
+    discount1: string;
+    discounttype: string;
+    size: string;
+    color: string;
+    views: string;
+    stock: string;
+    stockColor: string;
+    expDelivery: string;
+    type?: string;
+    orders?: string;
+    quantity?: number;
+    category: string;
+    subImg: SubImage[];
+    droptext:string;
+}
+
+interface SubImage {
+    sImg: string; // URL of the sub-image
+    sImgColor:string
+}
+//E-commerce Master Data 
+export const MasterData: ProductInfo[] = [
+    {
+        id: 1,
+        productpicture: "/assets/images/ecommerce/png/1.png",
+        title: "Lightweight Sofa",
+        status: "Patagonia",
+        class: "primary",
+        rating: "(563)",
+        price: "$12,957",
+        discount: "$11,846",
+        discount1: "24%",
+        discounttype:"shipping",
+        size: "M",
+        color: "primary",
+        views: "",
+        droptext:'Black',
+        stock: "In Stock",
+        stockColor: "success",
+        expDelivery: '2 Days',
+        type: 'sim',
+        category: 'Furniture',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 2,
+        productpicture: "/assets/images/ecommerce/png/14.png",
+        title: "Altra Pro Max Camera",
+        status: "Stella McCartney",
+        class: "danger",
+        rating: "(235)",
+        views: "23,123",
+        droptext:'Orange',
+        price: "$3,675",
+        discount: "$2,965",
+        discount1: "75%",
+        discounttype:"Merchant",
+        size: "L",
+        color: "secondary",
+        stock: "Out Of Stock",
+        expDelivery: '3 Days',
+        stockColor: "danger",
+        type: 'sim',
+        category: 'Clothing',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 3,
+        productpicture: "/assets/images/ecommerce/png/33.png",
+        title: "Perfume",
+        status: "Reformation",
+        class: "success",
+        rating: "(1025)",
+        views: "35,586",
+        droptext:'Pink',
+        price: "$345",
+        discount: "$256",
+        discount1: "92%",
+        discounttype:"Merchant",
+        size: "M",
+        color: "success",
+        stock: "In Stock",
+        expDelivery: '2 Days',
+        stockColor: "success",
+        orders: 'Pending',
+        type: 'sim',
+        category: 'Accessories',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 4,
+        productpicture: "/assets/images/ecommerce/png/10.png",
+        title: "Alaram Clock",
+        status: "Supreme",
+        class: "danger",
+        rating: "(674)",
+        views: "15,253",
+        droptext:'Green',
+        price: "$1,200",
+        discount: "$974",
+        discount1: "35%",
+        discounttype:"Merchant",
+        size: "Bluetooth",
+        color: "info",
+        expDelivery: '4 Days',
+        stock: "Out Of Stock",
+        stockColor: "danger",
+        type: 'sim',
+        orders: 'Shipped',
+        category: 'Decoration',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 5,
+        productpicture: "/assets/images/ecommerce/png/37.png",
+        title: "Lightweight Sneakers",
+        status: "Stealth Series",
+        class: "success",
+        rating: "(874)",
+        views: "20,989",
+        droptext:'Black',
+        price: "$880",
+        discount: "$771",
+        discount1: "25%",
+        discounttype:"shipping",
+        size: "500ML",
+        color: "warning",
+        expDelivery: '5 Days',
+        stock: "In Stock",
+        stockColor: "success",
+        orders: 'cancelled',
+        category: 'Accessories',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 6,
+        productpicture: "/assets/images/ecommerce/png/35.png",
+        title: "Samsung Headset",
+        status: "Givenchy",
+        class: "success",
+        rating: "(874)",
+        droptext:'Black',
+        views: "22,989",
+        price: "$12,764",
+        stock: "Out Of Stock",
+        stockColor: "danger",
+        discount: "$11,856",
+        discount1: "54%",
+        discounttype:"Merchant",
+        expDelivery: '3 Days',
+        size: "Adjustable",
+        color: "teal",
+        orders: 'Shipped',
+        category: 'Furniture',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 7,
+        productpicture: "/assets/images/ecommerce/png/31.png",
+        title: "Ladies Stylish Hand bag",
+        status: "Balenciaga",
+        class: "success",
+        rating: "(453)",
+        views: "10,252",
+        droptext:'Pink',
+        price: "$999",
+        discount: "$640",
+        discount1: "43%",
+        discounttype:"shipping",
+        size: "Adjustable",
+        color: "pink",
+        expDelivery: '1 Days',
+        stock: "In Stock",
+        stockColor: "success",
+        quantity: 2,
+        orders: 'Pending',
+        category: 'Electronics',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 8,
+        productpicture: "/assets/images/ecommerce/png/36.png",
+        title: "Flower Pot ",
+        status: "Louis Vuitton",
+        class: "success",
+        rating: "(12)",
+        views: "10,989",
+        droptext:'Grey',
+        price: "$540",
+        discount: "$499",
+        discount1: "37%",
+        discounttype:"shipping",
+        size: "M",
+        color: "danger",
+        stock: "Out Of Stock",
+        expDelivery: '5 Days',
+        stockColor: "danger",
+        quantity: 2,
+        orders: 'cancelled',
+        category: 'Clothing',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 9,
+        productpicture: "/assets/images/ecommerce/png/9.png",
+        title: " Versatile Hoodie",
+        status: "Urban Flex",
+        class: "danger",
+        rating: "(142)",
+        views: "50,989",
+        droptext:'Black',
+        price: "$251",
+        discount: "$399",
+        discount1: "15%",
+        discounttype:"shipping",
+        size: "M",
+        color: "purple",
+        stock: "In Stock",
+        expDelivery: '7 Days',
+        stockColor: "success",
+        orders: 'Shipped',
+        quantity: 2,
+        category: 'Clothing',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 10,
+        productpicture: "/assets/images/ecommerce/png/7.png",
+        title: "Wireless Headphones",
+        status: "SoundWave",
+        class: "success",
+        rating: "(142)",
+        views: "45,989",
+        droptext:'Black',
+        price: "$251",
+        discount: "$399",
+        discount1: "21%",
+        discounttype:"shipping",
+        size: "Small",
+        color: "primary",
+        stock: "Out Of Stock",
+        expDelivery: '4 Days',
+        stockColor: "danger",
+        quantity: 2,
+        orders: 'Shipped',
+        category: 'Electronics',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 11,
+        productpicture: "/assets/images/ecommerce/png/31.png",
+        title: " Wireless Earbuds",
+        status: "AirPods Max",
+        class: "danger",
+        rating: "(211)",
+        views: "45,989",
+        droptext:'Black',
+        price: "$314",
+        discount: "$547",
+        discount1: "60%",
+        discounttype:"shipping",
+        size: "XL",
+        color: "pink",
+        stock: "In Stock",
+        expDelivery: '2 Days',
+        stockColor: "success",
+        quantity: 2,
+        orders: 'cancelled',
+        category: 'Electeonics',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+    {
+        id: 12,
+        productpicture: "/assets/images/ecommerce/png/6.png",
+        title: "Trendy chair",
+        status: "Crystal Clear",
+        class: "success",
+        rating: "(514)",
+        views: "45,989",
+        droptext:'Black',
+        price: "$251",
+        discount: "$399",
+        discount1: "10%",
+        discounttype:"shipping",
+        size: "M",
+        color: "dark",
+        stock: "Out Of Stock",
+        expDelivery: '2 Days',
+        stockColor: "danger",
+        quantity: 2,
+        orders: 'Pending',
+        category: 'Accessories',
+        subImg: [
+            { sImg: "/assets/images/ecommerce/png/5.png",sImgColor:'bg-primary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/2.png",sImgColor:'bg-secondary-transparent' },
+            { sImg: "/assets/images/ecommerce/png/3.png" ,sImgColor:'bg-success-transparent'},
+            { sImg: "/assets/images/ecommerce/png/4.png",sImgColor:'bg-info-transparent' },
+        ]
+    },
+]
+
+
+
+
