@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
-    "start": "next start --webpack",
+    "start": "next start",
     "lint": "next lint",
     "postcss": "sass ./public/assets/scss/style.scss ./public/assets/css/style.css && postcss ./public/assets/css/style.css -o ./public/assets/css/style.css",
     "sass": "sass ./public/assets/scss/:./public/assets/css/",
