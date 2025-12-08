@@ -30,7 +30,7 @@ const NationalityMasterSchema = new Schema<INationalityMaster>(
 );
 
 // ensure unique index on code
-NationalityMasterSchema.index({ code: 1 }, { unique: true });
+// NationalityMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.NationalityMaster ||
   mongoose.model<INationalityMaster>("NationalityMaster", NationalityMasterSchema);

@@ -36,7 +36,7 @@ const RouteOfAdministrationMasterSchema = new Schema<IRouteOfAdministrationMaste
 );
 
 // ensure unique index on code
-RouteOfAdministrationMasterSchema.index({ code: 1 }, { unique: true });
+//RouteOfAdministrationMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.RouteOfAdministrationMaster ||
   mongoose.model<IRouteOfAdministrationMaster>(

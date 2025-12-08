@@ -30,7 +30,7 @@ const RelationshipTypeMasterSchema = new Schema<IRelationshipTypeMaster>(
 );
 
 // ensure unique index on code
-RelationshipTypeMasterSchema.index({ code: 1 }, { unique: true });
+// RelationshipTypeMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.RelationshipTypeMaster ||
   mongoose.model<IRelationshipTypeMaster>(

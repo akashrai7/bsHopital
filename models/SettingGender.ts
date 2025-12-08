@@ -15,7 +15,7 @@ const SettingGenderSchema = new Schema<ISettingGender>(
 );
 
 // ensure index on name (unique)
-SettingGenderSchema.index({ name: 1 }, { unique: true });
+// SettingGenderSchema.index({ name: 1 }, { unique: true });
 
 export default mongoose.models.SettingGender ||
   mongoose.model<ISettingGender>("SettingGender", SettingGenderSchema);

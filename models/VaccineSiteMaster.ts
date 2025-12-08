@@ -36,7 +36,7 @@ const VaccineSiteMasterSchema = new Schema<IVaccineSiteMaster>(
 );
 
 // ensure unique index on code
-VaccineSiteMasterSchema.index({ code: 1 }, { unique: true });
+// VaccineSiteMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.VaccineSiteMaster ||
   mongoose.model<IVaccineSiteMaster>("VaccineSiteMaster", VaccineSiteMasterSchema);

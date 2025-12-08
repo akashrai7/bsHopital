@@ -30,7 +30,7 @@ const CountryMasterSchema = new Schema<ICountryMaster>(
 );
 
 // ensure unique index on code
-CountryMasterSchema.index({ code: 1 }, { unique: true });
+// CountryMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.CountryMaster ||
   mongoose.model<ICountryMaster>("CountryMaster", CountryMasterSchema);

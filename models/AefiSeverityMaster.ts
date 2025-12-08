@@ -36,7 +36,7 @@ const AefiSeverityMasterSchema = new Schema<IAefiSeverityMaster>(
 );
 
 // ensure unique index on code
-AefiSeverityMasterSchema.index({ code: 1 }, { unique: true });
+// AefiSeverityMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.AefiSeverityMaster ||
   mongoose.model<IAefiSeverityMaster>("AefiSeverityMaster", AefiSeverityMasterSchema);

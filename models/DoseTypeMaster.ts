@@ -36,7 +36,7 @@ const DoseTypeMasterSchema = new Schema<IDoseTypeMaster>(
 );
 
 // ensure unique index on code
-DoseTypeMasterSchema.index({ code: 1 }, { unique: true });
+// DoseTypeMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.DoseTypeMaster ||
   mongoose.model<IDoseTypeMaster>("DoseTypeMaster", DoseTypeMasterSchema);

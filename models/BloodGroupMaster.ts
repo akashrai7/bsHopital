@@ -20,7 +20,7 @@ const BloodGroupMasterSchema = new Schema<IBloodGroupMaster>(
 );
 
 // unique index on code (already in schema)
-BloodGroupMasterSchema.index({ code: 1 }, { unique: true });
+// BloodGroupMasterSchema.index({ code: 1 }, { unique: true });
 
 export default mongoose.models.BloodGroupMaster ||
   mongoose.model<IBloodGroupMaster>("BloodGroupMaster", BloodGroupMasterSchema);
