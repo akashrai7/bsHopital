@@ -123,9 +123,8 @@ export const MENUITEMS: any = [
           { path: "/settings/routes-of-administration/", type: "link", active: false, selected: false, dirchange: false, title: "Routes of administration" },
           { path: "/settings/vaccine-sites/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Sites" },
           { path: "/settings/dose-types/", type: "link", active: false, selected: false, dirchange: false, title: "Dose Type" },
-          
           { path: "/settings/vaccine-manufacturers/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Manufacturers" },
-          { path: "/settings/vaccine-storage/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Storage" },
+          { path: "/settings/vaccine-storage-conditions/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Storage" },
           { path: "/settings/aefi-severities/", type: "link", active: false, selected: false, dirchange: false, title: "AEFI Severities" },
          // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
 

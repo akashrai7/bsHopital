@@ -7,7 +7,7 @@
 // import { Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 
 // import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
-// import { layout1, layout10, layout11, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9 } from "@/shared/data/prism-code/forms-prism";
+ import { layout1, layout10, layout11, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9 } from "@/shared/data/prism-code/forms-prism";
 // import ShowCode from "@/shared/layouts-components/showcode/showcode";
 
 // interface DataTablesProps { }
@@ -102,7 +102,7 @@ export default function GenderPage() {
         setList(Array.isArray(data.data) ? data.data : data.data.items || []);
       }
     } catch (err) {
-      console.error("Fetch genders error:", err);
+     // console.error("Fetch genders error:", err);
       toast.error("Server error while fetching genders");
     } finally {
       setLoading(false);
@@ -156,7 +156,7 @@ export default function GenderPage() {
         fetchList();
       }
     } catch (err) {
-      console.error("Save gender error:", err);
+    //  console.error("Save gender error:", err);
       toast.error("Server error while saving");
     } finally {
       setSubmitting(false);
@@ -204,7 +204,7 @@ export default function GenderPage() {
       <Pageheader title="Settings" currentpage="Genders" activepage="Gender" />
 
       <Row>
-        <Col xxl={4}>
+        <Col xl={6}>
           <Card className="custom-card">
             <Card.Header>
               <Card.Title>{editingId ? "Edit Gender" : "Add Gender"}</Card.Title>
@@ -241,7 +241,7 @@ export default function GenderPage() {
           </Card>
         </Col>
 
-        <Col xxl={8}>
+        <Col xl={6}>
           <Card className="custom-card">
             <Card.Header>
               <Card.Title>Gender List</Card.Title>
