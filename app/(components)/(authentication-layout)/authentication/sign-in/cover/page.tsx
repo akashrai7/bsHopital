@@ -283,6 +283,9 @@ const Cover: React.FC<CoverProps> = () => {
               <Card className="custom-card border-0 shadow-none my-4">
                 <Card.Body className="p-5">
                   <div>
+                   <div style={{ width: "40%", position: "relative", height: "60px" }}>
+                      <Image fill src="/assets/images/brand-logos/logo.png" alt="logo" style={{ objectFit: "contain" }} />
+                    </div>
                     <h4 className="mb-1 fw-semibold">Hi, Welcome back!</h4>
                     <p className="mb-4 text-muted fw-normal">Please enter your credentials</p>
                   </div>
@@ -375,9 +378,9 @@ const Cover: React.FC<CoverProps> = () => {
         <Col xxl={3} xl={3} lg={12} className="d-xl-block d-none px-0">
           <div className="authentication-cover overflow-hidden">
             <div className="authentication-cover-logo">
-              <Link scroll={false} href="/dashboards/sales">
+              <Link scroll={false} href="#">
                 {/* Use absolute public path to avoid relative import issues */}
-                <Image fill src="/assets/images/brand-logos/logo.png" alt="logo" className="desktop-dark" />
+                <Image fill src="/assets/images/brand-logos/toggle-logo.png" alt="logo" className="desktop-dark" />
               </Link>
             </div>
             <div className="authentication-cover-background">
@@ -388,7 +391,7 @@ const Cover: React.FC<CoverProps> = () => {
                 <h3 className="fw-semibold lh-base">Welcome to Dashboard</h3>
                 <p className="mb-0 text-muted fw-medium">Manage your website and content with ease using our powerful admin tools.</p>
               </div>
-              <div>
+               <div style={{ width: "100%", position: "relative", height: "310px" }}>
                 <Image fill src="/assets/images/login/Baby-Shield-Login.png" alt="" className="img-fluid" />
               </div>
             </div>
