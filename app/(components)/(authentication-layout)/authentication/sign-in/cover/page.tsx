@@ -377,7 +377,7 @@ const Cover: React.FC<CoverProps> = () => {
             <div className="authentication-cover-logo">
               <Link scroll={false} href="/dashboards/sales">
                 {/* Use absolute public path to avoid relative import issues */}
-                <Image fill src="/assets/images/brand-logos/toggle-logo.png" alt="logo" className="desktop-dark" />
+                <Image fill src="/assets/images/brand-logos/logo.png" alt="logo" className="desktop-dark" />
               </Link>
             </div>
             <div className="authentication-cover-background">
@@ -389,7 +389,7 @@ const Cover: React.FC<CoverProps> = () => {
                 <p className="mb-0 text-muted fw-medium">Manage your website and content with ease using our powerful admin tools.</p>
               </div>
               <div>
-                <Image fill src="/assets/images/media/media-72.png" alt="" className="img-fluid" />
+                <Image fill src="/assets/images/login/Baby-Shield-Login.png" alt="" className="img-fluid" />
               </div>
             </div>
           </div>

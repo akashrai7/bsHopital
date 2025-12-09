@@ -126,7 +126,7 @@ export const MENUITEMS: any = [
           
           { path: "/settings/vaccine-manufacturers/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Manufacturers" },
           { path: "/settings/vaccine-storage/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Storage" },
-          { path: "/settings/gender/", type: "link", active: false, selected: false, dirchange: false, title: "Genders" },
+          { path: "/settings/aefi-severities/", type: "link", active: false, selected: false, dirchange: false, title: "AEFI Severities" },
          // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
 
         ]
