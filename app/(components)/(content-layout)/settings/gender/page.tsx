@@ -71,7 +71,7 @@ import { Card, Col, Form, Row, Table, InputGroup } from "react-bootstrap";
 import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { layout1, layout10, layout11, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9 } from "@/shared/data/prism-code/forms-prism";
+// import { layout1, layout10, layout11, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9 } from "@/shared/data/prism-code/forms-prism";
 import ShowCode from "@/shared/layouts-components/showcode/showcode";
 
 type GenderItem = {
