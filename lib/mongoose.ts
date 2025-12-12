@@ -19,4 +19,12 @@ export async function connectMongo() {
   //  console.error("❌ MongoDB Connection Failed", error);
     throw new Error("MongoDB connection error");
   }
+
+
+try{
+  require("@/models");
+}catch(e){
+  try {require("../models");} catch{}
+}
+return mongoose;
 }

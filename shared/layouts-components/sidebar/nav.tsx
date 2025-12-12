@@ -105,7 +105,7 @@ export const MENUITEMS: any = [
       // { path: "/dashboards/pos-system", type: "link", icon: Svgicons.Posicon, active: false, selected: false, dirchange: false, title: "POS System" },
     ]
   },
-
+  
   {
     menutitle:'WEB APPS'
  },
@@ -119,13 +119,14 @@ export const MENUITEMS: any = [
           { path: "/settings/blood-groups/", type: "link", active: false, selected: false, dirchange: false, title: "Blood Group" },
           { path: "/settings/relationship-types/", type: "link", active: false, selected: false, dirchange: false, title: "Relationship" },
           { path: "/settings/nationalities/", type: "link", active: false, selected: false, dirchange: false, title: "Nationality" },
-          { path: "/settings/countries/", type: "link", active: false, selected: false, dirchange: false, title: "Country" },
+          { path: "/settings/languages/", type: "link", active: false, selected: false, dirchange: false, title: "Languages" },
           { path: "/settings/routes-of-administration/", type: "link", active: false, selected: false, dirchange: false, title: "Routes of administration" },
           { path: "/settings/vaccine-sites/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Sites" },
           { path: "/settings/dose-types/", type: "link", active: false, selected: false, dirchange: false, title: "Dose Type" },
           { path: "/settings/vaccine-manufacturers/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Manufacturers" },
           { path: "/settings/vaccine-storage-conditions/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccine Storage" },
           { path: "/settings/aefi-severities/", type: "link", active: false, selected: false, dirchange: false, title: "AEFI Severities" },
+          { path: "/settings/countries/", type: "link", active: false, selected: false, dirchange: false, title: "Country" },
           { path: "/settings/states/", type: "link", active: false, selected: false, dirchange: false, title: "States" },
           { path: "/settings/districts/", type: "link", active: false, selected: false, dirchange: false, title: "Districts" },
          
@@ -136,6 +137,41 @@ export const MENUITEMS: any = [
       },
     ],
   },
+
+  {
+    menutitle:'WEB APPS'
+ },
+ {
+    title: "Users", icon: Svgicons.Profileicon, type: "sub", active: false, selected: false, dirchange: false, children: [
+
+      {
+        title: "Parents", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
+
+          { path: "/admin/parents/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
+          { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
+          { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
+         
+
+          // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
+
+        ]
+      },
+      {
+        title: "Childs", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
+
+          { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
+          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
+          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
+         
+
+          // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
+
+        ]
+      },
+    ],
+  },
+
+
 /*
   {
     title: "Applications", icon: Svgicons.Applicationicon, type: "sub", active: false, selected: false, dirchange: false, children: [
