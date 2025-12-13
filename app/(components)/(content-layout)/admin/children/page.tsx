@@ -107,8 +107,8 @@ export default function AdminChildrenListPage() {
             <Card.Footer className="d-flex justify-content-between">
               <div><small className="text-muted">Showing {rows.length} of {total}</small></div>
               <div>
-                <SpkButton Buttonvariant="light" Customclass="btn btn-sm me-2" onClick={() => fetchList(Math.max(1, page - 1), q)}>Prev</SpkButton>
-                <SpkButton Buttonvariant="light" Customclass="btn btn-sm" onClick={() => fetchList(page + 1, q)}>Next</SpkButton>
+                {/* <SpkButton Buttonvariant="light" Customclass="btn btn-sm me-2" onClick={() => fetchList(Math.max(1, page - 1), q)}>Prev</SpkButton>
+                <SpkButton Buttonvariant="light" Customclass="btn btn-sm" onClick={() => fetchList(page + 1, q)}>Next</SpkButton> */}
               </div>
             </Card.Footer>
           </Card>

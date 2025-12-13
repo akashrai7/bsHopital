@@ -149,7 +149,7 @@ export const MENUITEMS: any = [
 
           { path: "/admin/parents/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
           { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
-          { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
+          // { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
          
 
           // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
@@ -161,7 +161,7 @@ export const MENUITEMS: any = [
 
           { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
           { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Childs List" },
-          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "View Childs" },
+          // { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "View Childs" },
          
 
           // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
