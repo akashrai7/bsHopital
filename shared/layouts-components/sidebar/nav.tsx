@@ -159,9 +159,9 @@ export const MENUITEMS: any = [
       {
         title: "Childs", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
-          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
-          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
+          { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
+          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Childs List" },
+          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "View Childs" },
          
 
           // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },

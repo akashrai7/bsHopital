@@ -5,19 +5,39 @@ import ParentMaster from "@/models/ParentMaster";
 import { success, error } from "@/lib/response";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { verifyAccessToken } from "@/lib/jwt";
 
 export const runtime = "nodejs";
 
-// auth helper (allow admin/doctor/parent)
+// // auth helper (allow admin/doctor/parent)
+// async function requireAuth(req: Request) {
+//   const auth = req.headers.get("authorization") || "";
+//   if (!auth.startsWith("Bearer ")) throw { status: 401, message: "Unauthorized" };
+//   const token = auth.split(" ")[1];
+//   const payload: any = await verifyAccessToken(token);
+//   if (!payload) throw { status: 401, message: "Invalid token" };
+//   // payload should contain role and id
+//   return payload;
+// }
+
 async function requireAuth(req: Request) {
-  const auth = req.headers.get("authorization") || "";
-  if (!auth.startsWith("Bearer ")) throw { status: 401, message: "Unauthorized" };
-  const token = auth.split(" ")[1];
-  const payload: any = await verifyAccessToken(token);
+const cookieHeader = req.headers.get("cookie") || "";
+let tokenFromCookie = "";
+if (cookieHeader) {
+  const cookies = Object.fromEntries(cookieHeader.split(';').map(s => s.trim().split('=')));
+  tokenFromCookie = cookies['accessToken'] || cookies['access_token'] || cookies['jwt'] || "";
+}
+const authHeader = req.headers.get("authorization") || (tokenFromCookie ? `Bearer ${tokenFromCookie}` : "");
+// then use authHeader same as before:
+if (!authHeader.startsWith("Bearer ")) {
+  return error("Unauthorized.", {}, 401);
+}
+const token = authHeader.split(" ")[1];
+const payload: any = await verifyAccessToken(token);
   if (!payload) throw { status: 401, message: "Invalid token" };
   // payload should contain role and id
-  return payload;
+   return payload;
 }
 
 function pad(num: number, len = 5) {

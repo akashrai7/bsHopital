@@ -127,7 +127,7 @@ export default function ChildAddEditPage() {
       return;
     }
     try {
-      const res = await fetch("/api/parents/check-by-aadhaar", {
+      const res = await fetch("/api/admin/children/check-by-aadhaar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ aadhaar: v }),
@@ -265,7 +265,8 @@ export default function ChildAddEditPage() {
     <>
       <Seo title={editId ? "Edit Child" : "Add Child"} />
       <Pageheader title="Children" currentpage={editId ? "Edit Child" : "Add Child"} activepage="Children" />
-
+    <Card.Body>
+    <form onSubmit={handleSubmit}>
       <Row>
         <Col xl={12}>
           <Card className="custom-card">
@@ -295,14 +296,14 @@ export default function ChildAddEditPage() {
                 </Col>
 
                 <Col xl={3}>
-                  <Form.Label>Gender *</Form.Label>
-                  <SpkSelect
-                    option={genders}
-                    defaultvalue={genders.find((g) => g.value === form.gender_code) ? [genders.find((g) => g.value === form.gender_code)] : []}
-                    onChange={(opt: any) => setForm({ ...form, gender_code: opt?.value || "" })}
-                    classNameprefix="Select2"
-                    menuplacement="auto"
-                  />
+                    <Form.Label>Gender *</Form.Label>
+                      <SpkSelect
+                          option={genders}
+                          defaultvalue={ genders.find((g) => g.value === form.gender_code)? [genders.find((g) => g.value === form.gender_code)!]  : []}
+                          {...({  onChange: (opt: any) =>  setForm({ ...form, gender_code: opt?.value || "" }), } as any)}
+                          classNameprefix="Select2"
+                          menuplacement="auto"
+                      />
                 </Col>
 
                 <Col xl={3}>
@@ -310,9 +311,9 @@ export default function ChildAddEditPage() {
                   <SpkSelect
                     option={bloods}
                     defaultvalue={bloods.find((b) => b.value === form.blood_group_code) ? [bloods.find((b) => b.value === form.blood_group_code)] : []}
-                    onChange={(opt: any) => setForm({ ...form, blood_group_code: opt?.value || "" })}
-                    classNameprefix="Select2"
-                    menuplacement="auto"
+                    {...({  onChange: (opt: any) =>  setForm({ ...form, blood_group_code: opt?.value || "" }), } as any)}
+                          classNameprefix="Select2"
+                          menuplacement="auto"
                   />
                 </Col>
 
@@ -336,20 +337,22 @@ export default function ChildAddEditPage() {
                   <Form.Control value={form.hospital_name} onChange={(e) => setForm({ ...form, hospital_name: e.target.value })} />
                 </Col>
 
-                <Col xl={4}>
-                  <Form.Label>Parent(s) *</Form.Label>
-                  <SpkSelect
-                    option={parentsOptions}
-                    defaultvalue={(parentsOptions.filter((p) => form.parent_ids.includes(p.value)) as any) || []}
-                    onChange={(opt: any) => {
-                      // SpkSelect may return single or array depending on config; normalize to array of ids
-                      const vals = Array.isArray(opt) ? opt.map((x) => x.value) : (opt ? [opt.value] : []);
-                      setForm({ ...form, parent_ids: vals });
-                    }}
-                    classNameprefix="Select2"
-                    menuplacement="auto"
-                  />
-                </Col>
+                
+                  <Col xl={4}>
+                    <Form.Label>Parent(s)</Form.Label>
+                    <SpkSelect
+                      option={parentsOptions}
+                      defaultvalue={parentsOptions.filter(p =>
+                        form.parent_ids.includes(p.value)
+                      )}
+                      disabled
+                      classNameprefix="Select2"
+                    />
+                  </Col>
+               
+                  {/* <Form.Label>Parent(s) ID</Form.Label> */}
+                  {/* <Form.Control value={form.parent_ids} hidden onChange={(e) => setForm({ ...form, parent_ids: e.target.value })} /> */}
+                
 
                 <Col xl={4}>
                   <Form.Label>Primary Contact</Form.Label>
@@ -377,16 +380,38 @@ export default function ChildAddEditPage() {
                   <Form.Control as="textarea" rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
                 </Col>
 
-                <Col xl={12} className="mt-3">
-                  <SpkButton Buttontype="submit" Customclass="btn btn-primary" Disabled={saving || loading} onClick={() => handleSubmit()}>
-                    {saving ? (editId ? "Updating..." : "Saving...") : (editId ? "Update Child" : "Save Child")}
-                  </SpkButton>
-                </Col>
+        
+ <Col xl={12}>
+                    {/* <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={saving}
+                    >
+                      {saving
+                        ? "Saving..."
+                        : editId
+                        ? "Update Child"
+                        : "Save Child"}
+                    </button> */}
+
+                     <SpkButton
+                                          Buttontype="submit"
+                                          Customclass="btn btn-primary"
+                                          Disabled={saving || loading}
+                                        >
+                                          {saving ? (editId ? "Updating..." : "Saving...") : (editId ? "Update Child" : "Save Child")}
+                                        </SpkButton>
+                  </Col>
+
+                  
               </Row>
             </Card.Body>
           </Card>
         </Col>
       </Row>
+    </form>
+    </Card.Body>
     </>
   );
 }
+
