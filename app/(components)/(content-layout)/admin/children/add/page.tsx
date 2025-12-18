@@ -1,44 +1,38 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Seo from "@/shared/layouts-components/seo/seo";
 import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
 import { Card, Col, Row, Form, InputGroup } from "react-bootstrap";
-import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
-import SpkSelect from "@/shared/@spk-reusable-components/reusable-plugins/spk-reactselect";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSearchParams, useRouter } from "next/navigation";
+import SpkSelect from "@/shared/@spk-reusable-components/reusable-plugins/spk-reactselect";
+import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
 
 type Option = { value: string; label: string };
 
 function getAuthHeader() {
-  try {
-    const t = typeof window !== "undefined" ? (localStorage.getItem("accessToken") || "") : "";
-    return t ? { Authorization: `Bearer ${t}` } : {};
-  } catch {
-    return {};
-  }
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export default function ChildAddEditPage() {
-  const search = useSearchParams();
-  const editId = search?.get("id") || null;
   const router = useRouter();
+  const search = useSearchParams();
+  const editId = search?.get("id");
 
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  // parent lookup
   const [lookupAadhaar, setLookupAadhaar] = useState("");
   const [parentFound, setParentFound] = useState<any>(null);
 
-  // masters
+   // parent lookup
+   const [aadhaar, setAadhaar] = useState("");
+
   const [genders, setGenders] = useState<Option[]>([]);
   const [bloods, setBloods] = useState<Option[]>([]);
-  const [parentsOptions, setParentsOptions] = useState<Option[]>([]);
 
-  // form
   const [form, setForm] = useState<any>({
     full_name: "",
     dob: "",
@@ -50,368 +44,577 @@ export default function ChildAddEditPage() {
     hospital_name: "",
     birth_registration_id: "",
     parent_ids: [],
-    photo: "",
     primary_contact: "",
     preferred_clinic_id: "",
     notes: "",
     consent_data_sharing: false,
+    photo_file: null,
   });
 
   useEffect(() => {
-    // load masters and parents list
-    fetchMasters();
+    loadMasters();
     if (editId) loadForEdit(editId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId]);
 
-  async function fetchMasters() {
-    try {
-      const g = await fetch("/api/settings/genders");
-      const gj = await g.json();
-      if (gj?.status) setGenders((gj.data || []).map((x: any) => ({ value: x.code, label: `${x.name} (${x.code})` })));
-
-      const b = await fetch("/api/settings/blood-groups");
-      const bj = await b.json();
-      if (bj?.status) setBloods((bj.data || []).map((x: any) => ({ value: x.code, label: `${x.name} (${x.code})` })));
-
-      // parents for selection
-      const p = await fetch("/api/admin/parents?page=1&limit=200", { headers: { ...(getAuthHeader() as any) } });
-      const pj = await p.json();
-      if (pj?.status) {
-        setParentsOptions((pj.data.data || []).map((r: any) => ({ value: r._id, label: `${r.first_name} ${r.last_name} (${r.parent_uid})` })));
-      }
-    } catch (err) {
-      console.error("fetchMasters", err);
+  async function loadMasters() {
+    const g = await fetch("/api/settings/genders");
+    const gj = await g.json();
+    if (gj?.status) {
+      setGenders(gj.data.map((x: any) => ({ value: x.code, label: x.name })));
     }
-  }
 
-  async function loadForEdit(id: string) {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/children/${id}`, { headers: { ...(getAuthHeader() as any) } });
-      const data = await res.json();
-      if (!data?.status) {
-        toast.error(data?.message || "Failed to load child");
-        return;
-      }
-      const c = data.data;
-      setForm({
-        full_name: c.full_name || "",
-        dob: c.dob ? c.dob.split("T")[0] : "",
-        gender_code: c.gender_code || "",
-        blood_group_code: c.blood_group_code || "",
-        birth_weight_kg: c.birth_weight_kg || "",
-        birth_length_cm: c.birth_length_cm || "",
-        place_of_birth: c.place_of_birth || "",
-        hospital_name: c.hospital_name || "",
-        birth_registration_id: c.birth_registration_id || "",
-        parent_ids: (c.parent_ids || []).map((p: any) => (typeof p === "object" ? p._id : p)),
-        photo: c.photo || "",
-        primary_contact: c.primary_contact || "",
-        preferred_clinic_id: c.preferred_clinic_id || "",
-        notes: c.notes || "",
-        consent_data_sharing: !!c.consent_data_sharing,
-      });
-    } catch (err) {
-      console.error("loadForEdit", err);
-      toast.error("Failed to load child");
-    } finally {
-      setLoading(false);
+    const b = await fetch("/api/settings/blood-groups");
+    const bj = await b.json();
+    if (bj?.status) {
+      setBloods(bj.data.map((x: any) => ({ value: x.code, label: x.name })));
     }
   }
 
   async function handleLookupParent() {
-    const v = (lookupAadhaar || "").toString().trim();
-    if (!/^\d{12}$/.test(v)) {
-      toast.error("Enter valid 12-digit Aadhaar");
+    if (!/^\d{12}$/.test(lookupAadhaar)) {
+      toast.error("Valid 12 digit Aadhaar required");
       return;
     }
+
+    const res = await fetch("/api/admin/children/check-by-aadhaar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aadhaar: lookupAadhaar }),
+    });
+
+    const data = await res.json();
+    if (!data?.status) {
+      toast.error("Lookup failed");
+      return;
+    }
+
+    if (!data.data.found) {
+      toast.info("Parent not found. Redirecting...");
+      router.push("/admin/parents/add");
+      return;
+    }
+
+    const p = data.data.parent;
+    setParentFound(p);
+    setForm((f: any) => ({
+      ...f,
+      parent_ids: [p._id],
+      primary_contact: p.phone,
+    }));
+  }
+ async function loadForEdit(id: string) {
     try {
-      const res = await fetch("/api/admin/children/check-by-aadhaar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ aadhaar: v }),
+      const r = await fetch(`/api/admin/children/${id}`,
+         { headers: { "Content-Type": "application/json" }, });
+      const j = await r.json();
+      if (!j?.status) return toast.error("Failed to load child");
+
+      const c = j.data;
+      setParentFound(c.parent_ids?.[0] || null);
+
+      setForm({
+        ...form,
+        ...c,
+        dob: c.dob?.split("T")[0],
+        parent_ids: c.parent_ids?.map((p: any) => p._id || p) || [],
       });
-      const data = await res.json();
-      if (!data?.status) {
-        toast.error("Lookup failed");
-        return;
-      }
-      if (!data.data?.found) {
-        toast.info("Parent not found. Redirecting to Add Parent page.");
-        router.push("/admin/parents/add");
-        return;
-      }
-      const p = data.data.parent;
-      setParentFound(p);
-      // prefill primary contact and default parent_ids
-      setForm((prev: any) => ({
-        ...prev,
-        primary_contact: p.phone || prev.primary_contact,
-        parent_ids: [p._id],
-      }));
-      toast.success("Parent found and prefilling contact/parent selection.");
-    } catch (err) {
-      console.error("lookup parent", err);
-      toast.error("Lookup error");
+    } catch {
+      toast.error("Load error");
     }
   }
-
-  // photo upload handler — uses your existing upload endpoint for parent-photo or create /api/upload/child-photo
-  async function handlePhotoFile(file?: File | null) {
-    if (!file) return "";
+ /* =========================
+     PHOTO UPLOAD
+  ========================== */
+  async function uploadPhoto(file: File) {
     const fd = new FormData();
     fd.append("file", file);
-    try {
-      const res = await fetch("/api/upload/child-photo", {
-        method: "POST",
-        body: fd,
-        headers: { ...(getAuthHeader() as any) }, // if required
-      });
-      const data = await res.json();
-      if (!data?.status) {
-        toast.error("Upload failed");
-        return "";
-      }
-      return data.data.url;
-    } catch (err) {
-      console.error("photo upload", err);
-      toast.error("Upload failed");
-      return "";
-    }
+
+    const r = await fetch("/api/upload/child-photo", {
+      method: "POST",
+      body: fd,
+      headers: { "Content-Type": "application/json" },
+    });
+    const j = await r.json();
+    if (!j?.status) throw new Error("Upload failed");
+    return j.data.url;
   }
 
-  async function handleSubmit(e?: React.FormEvent) {
-    e?.preventDefault();
-    // basic client validation
-    if (!form.full_name || form.full_name.length > 100) {
-      toast.error("Enter valid full name (1-100 chars)");
-      return;
-    }
-    if (!form.dob) {
-      toast.error("Enter DOB");
-      return;
-    }
-    if (!form.gender_code) {
-      toast.error("Select gender");
-      return;
-    }
-    if (!form.parent_ids || form.parent_ids.length === 0) {
-      toast.error("At least one parent required");
-      return;
-    }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!form.full_name) return toast.error("Child full name required");
+    if (!form.dob) return toast.error("DOB required");
+    if (!form.gender_code) return toast.error("Gender required");
+    if (!form.parent_ids.length) return toast.error("Parent required");
 
     setSaving(true);
-    try {
-      // if photo file present in form.profile_photo_file, upload first
-      let photoUrl = form.photo;
-      if ((form as any).photo_file instanceof File) {
-        const up = await handlePhotoFile((form as any).photo_file);
-        if (up) photoUrl = up;
-        else { setSaving(false); return; }
-      }
+try{
+    let photo = form.photo;
 
-      const payload: any = {
-        full_name: form.full_name,
-        dob: form.dob,
-        gender_code: form.gender_code,
-        blood_group_code: form.blood_group_code || undefined,
-        birth_weight_kg: form.birth_weight_kg || undefined,
-        birth_length_cm: form.birth_length_cm || undefined,
-        place_of_birth: form.place_of_birth || undefined,
-        hospital_name: form.hospital_name || undefined,
-        birth_registration_id: form.birth_registration_id || undefined,
-        parent_ids: form.parent_ids,
-        photo: photoUrl || undefined,
-        primary_contact: form.primary_contact || undefined,
-        preferred_clinic_id: form.preferred_clinic_id || undefined,
-        notes: form.notes || undefined,
-        consent_data_sharing: !!form.consent_data_sharing,
-      };
+    let photoUrl = "";
+    if (form.photo_file) {
+      const fd = new FormData();
+      fd.append("file", form.photo_file);
 
-      const url = editId ? `/api/admin/children/${editId}` : `/api/admin/children`;
-      const method = editId ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          ...(getAuthHeader() as any),
-        },
-        body: JSON.stringify(payload),
+      const up = await fetch("/api/upload/child-photo", {
+        method: "POST",
+        body: fd,
+        headers: { "Content-Type": "application/json" },
       });
-      const data = await res.json();
-      if (!data?.status) {
-        toast.error(data?.message || "Operation failed");
+
+      const uj = await up.json();
+      if (!uj?.status) {
+        toast.error("Photo upload failed");
+        setSaving(false);
         return;
       }
-      toast.success(editId ? "Child updated" : "Child created");
-      router.push("/admin/children");
-    } catch (err) {
-      console.error("submit child", err);
-      toast.error("Server error");
+      photoUrl = uj.data.url;
+    }
+
+    const payload = {
+      ...form,
+      photo: photoUrl || undefined,
+    };
+
+    const res = await fetch("/api/admin/children", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const out = await res.json();
+    if (!out?.status) {
+      toast.error(out.message || "Save failed");
+      setSaving(false);
+      return;
+    }
+    toast.success(editId ? "Child updated" : "Child saved successfully");
+  ////  router.push("/admin/children");
+
+      if (!editId) {
+        setForm({ ...form });
+        setParentFound(null);
+        setAadhaar("");
+      } else {
+        router.push("/admin/children");
+      }
+      } catch (e: any) {
+      toast.error(e.message || "Save failed");
     } finally {
       setSaving(false);
     }
   }
 
-  // file change
-  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0] || null;
-    setForm((prev: any) => ({ ...prev, photo_file: f, photo: f ? "" : prev.photo }));
-  }
-
   return (
     <>
-      <Seo title={editId ? "Edit Child" : "Add Child"} />
-      <Pageheader title="Children" currentpage={editId ? "Edit Child" : "Add Child"} activepage="Children" />
-    <Card.Body>
-    <form onSubmit={handleSubmit}>
-      <Row>
-        <Col xl={12}>
-          <Card className="custom-card">
-            <Card.Header>
-              <div className="card-title">{editId ? "Edit Child" : "Add Child"}</div>
-            </Card.Header>
-            <Card.Body>
-              <Row className="gy-3">
-                {/* Parent lookup */}
-                <Col xl={12}>
-                  <Form.Label>Parent Aadhaar (lookup)</Form.Label>
-                  <InputGroup>
-                    <Form.Control value={lookupAadhaar} onChange={(e) => setLookupAadhaar(e.target.value)} placeholder="Enter parent's Aadhaar (12 digits)" />
-                    <button type="button" className="btn btn-outline-primary" onClick={handleLookupParent}>Lookup</button>
-                  </InputGroup>
-                  {parentFound && <div className="mt-2"><strong>Found:</strong> {parentFound.first_name} {parentFound.last_name} — {parentFound.phone}</div>}
-                </Col>
+      <Seo title="Add Child" />
+      <Pageheader title="Children" currentpage="Add Child" activepage="Children" />
 
-                <Col xl={6}>
-                  <Form.Label>Full Name *</Form.Label>
-                  <Form.Control value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
-                </Col>
+      <form onSubmit={handleSubmit}>
+        <Card className="custom-card">
+          <Card.Body>
+            <Row className="gy-3">
+              <Col xl={12}>
+                <Form.Label>Parent Aadhaar</Form.Label>
+                <InputGroup>
+                  <Form.Control value={lookupAadhaar} onChange={(e) => setLookupAadhaar(e.target.value)} />
+                  <button type="button" className="btn btn-outline-primary" onClick={handleLookupParent}>
+                    Lookup
+                  </button>
+                </InputGroup>
+                {parentFound && (
+                  <div className="mt-2 text-success">
+                    Found: {parentFound.first_name} {parentFound.last_name} ({parentFound.phone})
+                  </div>
+                )}
+              </Col>
 
-                <Col xl={3}>
-                  <Form.Label>DOB *</Form.Label>
-                  <Form.Control type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} />
-                </Col>
+              <Col xl={6}>
+                <Form.Label>Full Name *</Form.Label>
+                <Form.Control value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+              </Col>
 
-                <Col xl={3}>
-                    <Form.Label>Gender *</Form.Label>
-                      <SpkSelect
-                          option={genders}
-                          defaultvalue={ genders.find((g) => g.value === form.gender_code)? [genders.find((g) => g.value === form.gender_code)!]  : []}
-                          {...({  onChange: (opt: any) =>  setForm({ ...form, gender_code: opt?.value || "" }), } as any)}
-                          classNameprefix="Select2"
-                          menuplacement="auto"
-                      />
-                </Col>
+              <Col xl={3}>
+                <Form.Label>DOB *</Form.Label>
+                <Form.Control type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} />
+              </Col>
 
-                <Col xl={3}>
-                  <Form.Label>Blood Group</Form.Label>
-                  <SpkSelect
-                    option={bloods}
-                    defaultvalue={bloods.find((b) => b.value === form.blood_group_code) ? [bloods.find((b) => b.value === form.blood_group_code)] : []}
-                    {...({  onChange: (opt: any) =>  setForm({ ...form, blood_group_code: opt?.value || "" }), } as any)}
-                          classNameprefix="Select2"
-                          menuplacement="auto"
-                  />
-                </Col>
+              <Col xl={3}>
+                <Form.Label>Gender *</Form.Label>
+                <Form.Select value={form.gender_code} onChange={(e) => setForm({ ...form, gender_code: e.target.value })}>
+                  <option value="">Select</option>
+                  {genders.map((g) => (
+                    <option key={g.value} value={g.value}>{g.label}</option>
+                  ))}
+                </Form.Select>
+              </Col>
+ 
 
-                <Col xl={3}>
-                  <Form.Label>Birth Weight (kg)</Form.Label>
-                  <Form.Control type="number" step="0.1" value={form.birth_weight_kg} onChange={(e) => setForm({ ...form, birth_weight_kg: e.target.value })} />
-                </Col>
+              <Col xl={3}>
+                <Form.Label>Blood Group</Form.Label>
+                <Form.Select value={form.blood_group_code} onChange={(e) => setForm({ ...form, blood_group_code: e.target.value })}>
+                  <option value="">Select</option>
+                  {bloods.map((b) => (
+                    <option key={b.value} value={b.value}>{b.label}</option>
+                  ))}
+                </Form.Select>
+              </Col>
 
-                <Col xl={3}>
-                  <Form.Label>Birth Length (cm)</Form.Label>
-                  <Form.Control type="number" value={form.birth_length_cm} onChange={(e) => setForm({ ...form, birth_length_cm: e.target.value })} />
-                </Col>
+              <Col xl={3}>
+                <Form.Label>Birth Weight (kg)</Form.Label>
+                <Form.Control type="number" step="0.1" value={form.birth_weight_kg}
+                  onChange={e => setForm({ ...form, birth_weight_kg: e.target.value })} />
+              </Col>
 
-                <Col xl={3}>
-                  <Form.Label>Place of Birth</Form.Label>
-                  <Form.Control value={form.place_of_birth} onChange={(e) => setForm({ ...form, place_of_birth: e.target.value })} />
-                </Col>
+              <Col xl={3}>
+                <Form.Label>Birth Length (cm)</Form.Label>
+                <Form.Control type="number" value={form.birth_length_cm}
+                  onChange={e => setForm({ ...form, birth_length_cm: e.target.value })} />
+              </Col>
 
-                <Col xl={3}>
-                  <Form.Label>Hospital Name</Form.Label>
-                  <Form.Control value={form.hospital_name} onChange={(e) => setForm({ ...form, hospital_name: e.target.value })} />
-                </Col>
+              <Col xl={3}>
+                <Form.Label>Place of Birth</Form.Label>
+                <Form.Control value={form.place_of_birth}
+                  onChange={e => setForm({ ...form, place_of_birth: e.target.value })} />
+              </Col>
 
-                
-                  <Col xl={4}>
-                    <Form.Label>Parent(s)</Form.Label>
-                    <SpkSelect
-                      option={parentsOptions}
-                      defaultvalue={parentsOptions.filter(p =>
-                        form.parent_ids.includes(p.value)
-                      )}
-                      disabled
-                      classNameprefix="Select2"
-                    />
-                  </Col>
-               
-                  {/* <Form.Label>Parent(s) ID</Form.Label> */}
-                  {/* <Form.Control value={form.parent_ids} hidden onChange={(e) => setForm({ ...form, parent_ids: e.target.value })} /> */}
-                
+              <Col xl={3}>
+                <Form.Label>Hospital Name</Form.Label>
+                <Form.Control value={form.hospital_name}
+                  onChange={e => setForm({ ...form, hospital_name: e.target.value })} />
+              </Col>
 
-                <Col xl={4}>
-                  <Form.Label>Primary Contact</Form.Label>
-                  <Form.Control value={form.primary_contact} onChange={(e) => setForm({ ...form, primary_contact: e.target.value })} />
-                </Col>
-
-                <Col xl={4}>
-                  <Form.Label>Preferred Clinic ID</Form.Label>
-                  <Form.Control value={form.preferred_clinic_id} onChange={(e) => setForm({ ...form, preferred_clinic_id: e.target.value })} />
-                </Col>
-
-                <Col xl={6}>
-                  <Form.Label>Photo</Form.Label>
-                  <Form.Control type="file" accept="image/*" onChange={onPhotoChange} />
-                  {form.photo && <div className="mt-2"><img src={form.photo} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 6 }} alt="child" /></div>}
-                </Col>
-
-                <Col xl={6}>
-                  <Form.Label>Birth Registration ID</Form.Label>
-                  <Form.Control value={form.birth_registration_id} onChange={(e) => setForm({ ...form, birth_registration_id: e.target.value })} />
-                </Col>
-
-                <Col xl={12}>
-                  <Form.Label>Notes</Form.Label>
-                  <Form.Control as="textarea" rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-                </Col>
-
-        
- <Col xl={12}>
-                    {/* <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={saving}
-                    >
-                      {saving
-                        ? "Saving..."
-                        : editId
-                        ? "Update Child"
-                        : "Save Child"}
-                    </button> */}
-
-                     <SpkButton
-                                          Buttontype="submit"
-                                          Customclass="btn btn-primary"
-                                          Disabled={saving || loading}
-                                        >
-                                          {saving ? (editId ? "Updating..." : "Saving...") : (editId ? "Update Child" : "Save Child")}
-                                        </SpkButton>
-                  </Col>
-
-                  
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </form>
-    </Card.Body>
+              <Col xl={12}>
+                <Form.Label>Notes</Form.Label>
+                <Form.Control as="textarea" rows={3}
+                  value={form.notes}
+                  onChange={e => setForm({ ...form, notes: e.target.value })} />
+              </Col>
+              <Col xl={12}>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? "Saving..." : "Save Child"}
+                </button>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </form>
     </>
   );
 }
+//////////////////////////////////////////////////////////////////////////
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { Card, Col, Row, Form, InputGroup } from "react-bootstrap";
+// import { useRouter, useSearchParams } from "next/navigation";
+// import Seo from "@/shared/layouts-components/seo/seo";
+// import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
+// import SpkSelect from "@/shared/@spk-reusable-components/reusable-plugins/spk-reactselect";
+// import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+
+// type Option = { value: string; label: string };
+
+// function getAuthHeader() {
+//   if (typeof window === "undefined") return {};
+//   const t = localStorage.getItem("accessToken");
+//   return t ? { Authorization: `Bearer ${t}` } : {};
+// }
+
+// const emptyForm = {
+//   full_name: "",
+//   dob: "",
+//   gender_code: "",
+//   blood_group_code: "",
+//   birth_weight_kg: "",
+//   birth_length_cm: "",
+//   place_of_birth: "",
+//   hospital_name: "",
+//   birth_registration_id: "",
+//   parent_ids: [] as string[],
+//   primary_contact: "",
+//   preferred_clinic_id: "",
+//   notes: "",
+//   consent_data_sharing: false,
+//   photo: "",
+//   photo_file: null as File | null,
+// };
+
+// export default function ChildAddEditPage() {
+//   const router = useRouter();
+//   const search = useSearchParams();
+//   const editId = search.get("id");
+
+//   const [form, setForm] = useState({ ...emptyForm });
+//   const [saving, setSaving] = useState(false);
+
+//   // masters
+//   const [genders, setGenders] = useState<Option[]>([]);
+//   const [bloods, setBloods] = useState<Option[]>([]);
+
+//   // parent lookup
+//   const [aadhaar, setAadhaar] = useState("");
+//   const [parentFound, setParentFound] = useState<any>(null);
+
+  /* =========================
+     LOAD MASTERS + EDIT DATA
+  ========================== */
+  // useEffect(() => {
+  //   loadMasters();
+  //   if (editId) loadForEdit(editId);
+  // }, [editId]);
+
+  // async function loadMasters() {
+  //   try {
+  //     const g = await fetch("/api/settings/genders");
+  //     const gj = await g.json();
+  //     if (gj?.status) {
+  //       setGenders(gj.data.map((x: any) => ({ value: x.code, label: x.name })));
+  //     }
+
+  //     const b = await fetch("/api/settings/blood-groups");
+  //     const bj = await b.json();
+  //     if (bj?.status) {
+  //       setBloods(bj.data.map((x: any) => ({ value: x.code, label: x.name })));
+  //     }
+  //   } catch {
+  //     toast.error("Failed to load master data");
+  //   }
+  // }
+/*  importent code for edit
+  async function loadForEdit(id: string) {
+    try {
+      const r = await fetch(`/api/admin/children/${id}`,
+         { headers: { "Content-Type": "application/json" }, });
+      const j = await r.json();
+      if (!j?.status) return toast.error("Failed to load child");
+
+      const c = j.data;
+      setParentFound(c.parent_ids?.[0] || null);
+
+      setForm({
+        ...emptyForm,
+        ...c,
+        dob: c.dob?.split("T")[0],
+        parent_ids: c.parent_ids?.map((p: any) => p._id || p) || [],
+      });
+    } catch {
+      toast.error("Load error");
+    }
+  }
+*/
+  /* =========================
+     PARENT AADHAAR LOOKUP
+  ========================== */
+  // async function lookupParent() {
+  //   if (!/^\d{12}$/.test(aadhaar)) {
+  //     toast.error("Enter valid 12-digit Aadhaar");
+  //     return;
+  //   }
+
+  //   try {
+  //     const r = await fetch("/api/admin/children/check-by-aadhaar", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ aadhaar }),
+  //     });
+  //     const j = await r.json();
+
+  //     if (!j?.data?.found) {
+  //       toast.info("Parent not found. Redirecting...");
+  //       router.push("/admin/parents/add");
+  //       return;
+  //     }
+
+  //     const p = j.data.parent;
+  //     setParentFound(p);
+
+  //     setForm(f => ({
+  //       ...f,
+  //       parent_ids: [p._id],
+  //       primary_contact: p.phone || "",
+  //     }));
+
+  //     toast.success("Parent found & locked");
+  //   } catch {
+  //     toast.error("Lookup failed");
+  //   }
+  // }
+
+  // /* =========================
+  //    PHOTO UPLOAD
+  // ========================== */
+  // async function uploadPhoto(file: File) {
+  //   const fd = new FormData();
+  //   fd.append("file", file);
+
+  //   const r = await fetch("/api/upload/child-photo", {
+  //     method: "POST",
+  //     body: fd,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  //   const j = await r.json();
+  //   if (!j?.status) throw new Error("Upload failed");
+  //   return j.data.url;
+  // }
+
+  /* =========================
+     SUBMIT
+  ========================== */
+ /*
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!form.full_name) return toast.error("Child full name required");
+    if (!form.dob) return toast.error("DOB required");
+    if (!form.gender_code) return toast.error("Gender required");
+    if (!form.parent_ids.length) return toast.error("Parent required");
+
+    setSaving(true);
+    try {
+      let photo = form.photo;
+      if (form.photo_file) photo = await uploadPhoto(form.photo_file);
+
+      const payload = {
+        ...form,
+        photo,
+        photo_file: undefined,
+      };
+
+      const r = await fetch(
+        editId ? `/api/admin/children/${editId}` : "/api/admin/children",
+        {
+          method: editId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json"},
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const j = await r.json();
+      if (!j?.status) throw new Error(j.message);
+
+      toast.success(editId ? "Child updated" : "Child added");
+
+      if (!editId) {
+        setForm({ ...emptyForm });
+        setParentFound(null);
+        setAadhaar("");
+      } else {
+        router.push("/admin/children");
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+*/
+  /* =========================
+     UI
+  ========================== */
+//   return (
+//     <>
+//       <Seo title={editId ? "Edit Child" : "Add Child"} />
+//       <Pageheader title="Children" currentpage={editId ? "Edit Child" : "Add Child"} />
+
+//       <form onSubmit={handleSubmit}>
+//         <Card className="custom-card">
+//           <Card.Body>
+//             <Row className="gy-3">
+
+//               {/* Parent Aadhaar */}
+//               <Col xl={12}>
+//                 <Form.Label>Parent Aadhaar</Form.Label>
+//                 <InputGroup>
+//                   <Form.Control value={aadhaar} onChange={e => setAadhaar(e.target.value)} />
+//                   <button type="button" className="btn btn-outline-primary" onClick={lookupParent}>
+//                     Lookup
+//                   </button>
+//                 </InputGroup>
+//                 {parentFound && (
+//                   <div className="mt-2 text-success">
+//                     {parentFound.first_name} {parentFound.last_name} — {parentFound.phone}
+//                   </div>
+//                 )}
+//               </Col>
+
+//               <Col xl={6}>
+//                 <Form.Label>Child Full Name *</Form.Label>
+//                 <Form.Control value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>DOB *</Form.Label>
+//                 <Form.Control type="date" value={form.dob} onChange={e => setForm({ ...form, dob: e.target.value })} />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>Gender *</Form.Label>
+//                 <SpkSelect
+//                   option={genders}
+//                   defaultvalue={genders.filter(g => g.value === form.gender_code)}
+//                   {...({ onChange: (o: any) => setForm({ ...form, gender_code: o?.value }) } as any)}
+//                 />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>Blood Group</Form.Label>
+//                 <SpkSelect
+//                   option={bloods}
+//                   defaultvalue={bloods.filter(b => b.value === form.blood_group_code)}
+//                   {...({ onChange: (o: any) => setForm({ ...form, blood_group_code: o?.value }) } as any)}
+//                 />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>Birth Weight (kg)</Form.Label>
+//                 <Form.Control type="number" step="0.1" value={form.birth_weight_kg}
+//                   onChange={e => setForm({ ...form, birth_weight_kg: e.target.value })} />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>Birth Length (cm)</Form.Label>
+//                 <Form.Control type="number" value={form.birth_length_cm}
+//                   onChange={e => setForm({ ...form, birth_length_cm: e.target.value })} />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>Place of Birth</Form.Label>
+//                 <Form.Control value={form.place_of_birth}
+//                   onChange={e => setForm({ ...form, place_of_birth: e.target.value })} />
+//               </Col>
+
+//               <Col xl={3}>
+//                 <Form.Label>Hospital Name</Form.Label>
+//                 <Form.Control value={form.hospital_name}
+//                   onChange={e => setForm({ ...form, hospital_name: e.target.value })} />
+//               </Col>
+
+//               <Col xl={12}>
+//                 <Form.Label>Notes</Form.Label>
+//                 <Form.Control as="textarea" rows={3}
+//                   value={form.notes}
+//                   onChange={e => setForm({ ...form, notes: e.target.value })} />
+//               </Col>
+
+//               <Col xl={12}>
+//                 <SpkButton Buttontype="submit" Customclass="btn btn-primary" Disabled={saving}>
+//                   {saving ? "Saving..." : editId ? "Update Child" : "Save Child"}
+//                 </SpkButton>
+//               </Col>
+
+//             </Row>
+//           </Card.Body>
+//         </Card>
+//       </form>
+//     </>
+//   );
+// }
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
 

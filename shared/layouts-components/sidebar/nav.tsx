@@ -113,7 +113,7 @@ export const MENUITEMS: any = [
     title: "Settings", icon: Svgicons.Applicationicon, type: "sub", active: false, selected: false, dirchange: false, children: [
 
       {
-        title: "Settings", type: "sub", icon: Svgicons.Emailicon, active: false, children: [
+        title: "System Settings", type: "sub", icon: Svgicons.Emailicon, active: false, children: [
 
           { path: "/settings/gender/", type: "link", active: false, selected: false, dirchange: false, title: "Genders" },
           { path: "/settings/blood-groups/", type: "link", active: false, selected: false, dirchange: false, title: "Blood Group" },
@@ -161,11 +161,13 @@ export const MENUITEMS: any = [
 
           { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
           { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Childs List" },
-          // { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "View Childs" },
-         
+        ]
+      },
+       {
+        title: "Doctors", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
-
+          { path: "/admin/doctor/add", type: "link", active: false, selected: false, dirchange: false, title: "New Doctor" },
+          { path: "/admin/doctor/", type: "link", active: false, selected: false, dirchange: false, title: "Doctors List" },
         ]
       },
     ],
