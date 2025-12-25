@@ -129,6 +129,7 @@ export const MENUITEMS: any = [
           { path: "/settings/countries/", type: "link", active: false, selected: false, dirchange: false, title: "Country" },
           { path: "/settings/states/", type: "link", active: false, selected: false, dirchange: false, title: "States" },
           { path: "/settings/districts/", type: "link", active: false, selected: false, dirchange: false, title: "Districts" },
+          { path: "/settings/specialties/", type: "link", active: false, selected: false, dirchange: false, title: "Specialties" },
          
 
           // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
@@ -166,8 +167,8 @@ export const MENUITEMS: any = [
        {
         title: "Doctors", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          { path: "/admin/doctor/add", type: "link", active: false, selected: false, dirchange: false, title: "New Doctor" },
-          { path: "/admin/doctor/", type: "link", active: false, selected: false, dirchange: false, title: "Doctors List" },
+          { path: "/admin/doctors/add", type: "link", active: false, selected: false, dirchange: false, title: "New Doctor" },
+          { path: "/admin/doctors/", type: "link", active: false, selected: false, dirchange: false, title: "Doctors List" },
         ]
       },
     ],
