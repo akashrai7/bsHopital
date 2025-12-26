@@ -1,370 +1,3 @@
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import { Card, Col, Row, Form } from "react-bootstrap";
-// import { useRouter, useSearchParams } from "next/navigation";
-// import Seo from "@/shared/layouts-components/seo/seo";
-// import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-// import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
-// import SpkSelect from "@/shared/@spk-reusable-components/reusable-plugins/spk-reactselect";
-// import { toast } from "react-toastify";
-
-// /* ---------------- TYPES ---------------- */
-
-// type Option = { value: string; label: string };
-
-// type DoctorForm = {
-//   first_name: string;
-//   last_name: string;
-//   email: string;
-//   phone: string;
-//   aadhaar: string;
-//   password?: string;
-
-//   medical_registration_number: string;
-//   registration_council: string;
-//   qualifications: string;
-//   specialty?: string;
-//   years_experience: string;
-
-//   country: string;
-//   state: string;
-//   district: string;
-//   city: string;
-
-//   clinic_id: string;
-//   license_document: string;
-//   profile_photo: string;
-
-//   service_fee: string;
-//   bio: string;
-//   is_active: boolean;
-// };
-
-// /* ---------------- AUTH HEADER ---------------- */
-
-// function getAuthHeader(): HeadersInit {
-//   const token =
-//     typeof window !== "undefined"
-//       ? localStorage.getItem("accessToken")
-//       : null;
-//   return token ? { Authorization: `Bearer ${token}` } : {};
-// }
-
-// /* ================= COMPONENT ================= */
-
-// export default function DoctorAddEditPage() {
-//   const router = useRouter();
-//   const search = useSearchParams();
-//   const editId = search.get("id");
-
-//   const [saving, setSaving] = useState(false);
-//   const [checking, setChecking] = useState(false);
-//   const [errors, setErrors] = useState<Record<string, string>>({});
-
-//   /* -------- Masters -------- */
-//   const [countries, setCountries] = useState<Option[]>([]);
-//   const [states, setStates] = useState<Option[]>([]);
-//   const [districts, setDistricts] = useState<Option[]>([]);
-//   const [specialties, setSpecialties] = useState<Option[]>([]);
-
-//   /* -------- Form -------- */
-//   const [form, setForm] = useState<DoctorForm>({
-//     first_name: "",
-//     last_name: "",
-//     email: "",
-//     phone: "",
-//     aadhaar: "",
-//     password: "",
-
-//     medical_registration_number: "",
-//     registration_council: "",
-//     qualifications: "",
-//     specialty: "",
-//     years_experience: "",
-
-//     country: "",
-//     state: "",
-//     district: "",
-//     city: "",
-
-//     clinic_id: "",
-//     license_document: "",
-//     profile_photo: "",
-
-//     service_fee: "",
-//     bio: "",
-//     is_active: true,
-//   });
-
-//   /* ================= LOAD ================= */
-
-//   useEffect(() => {
-//     loadMasters();
-//     if (editId) loadDoctor(editId);
-//   }, [editId]);
-
-//   async function loadMasters() {
-//     const [c, s, d, sp] = await Promise.all([
-//       fetch("/api/settings/countries"),
-//       fetch("/api/settings/states"),
-//       fetch("/api/settings/districts"),
-//       fetch("/api/settings/specialties"),
-//     ]);
-
-//     setCountries((await c.json()).data.map((x: any) => ({ value: x._id, label: x.name })));
-//     setStates((await s.json()).data.map((x: any) => ({ value: x._id, label: x.name })));
-//     setDistricts((await d.json()).data.map((x: any) => ({ value: x._id, label: x.name })));
-//     setSpecialties((await sp.json()).data.map((x: any) => ({ value: x.code, label: x.name })));
-//   }
-
-//   async function loadDoctor(id: string) {
-//     const res = await fetch(`/api/admin/doctors/${id}`, {
-//       headers: { ...getAuthHeader() },
-//     });
-//     const j = await res.json();
-//     if (j.status) setForm(j.data);
-//   }
-
-//   /* ================= UPLOAD ================= */
-
-//   async function upload(file: File) {
-//     const fd = new FormData();
-//     fd.append("file", file);
-//     const res = await fetch("/api/upload/doctor", {
-//       method: "POST",
-//       body: fd,
-//     });
-//     const j = await res.json();
-//     return j.data.url;
-//   }
-
-//   /* ================= VALIDATION ================= */
-
-//   function validate(): boolean {
-//     const e: Record<string, string> = {};
-
-//     if (!form.first_name) e.first_name = "First name required";
-//     if (!form.last_name) e.last_name = "Last name required";
-//     if (!form.email) e.email = "Email required";
-//     if (!form.phone) e.phone = "Phone required";
-//     if (!form.aadhaar) e.aadhaar = "Aadhaar required";
-//     if (!editId && !form.password) e.password = "Password required";
-
-//    // if (!form.specialty) e.specialty = "Specialty required";
-//     if (!form.medical_registration_number)
-//       e.medical_registration_number = "Medical registration number required";
-//     if (!form.registration_council)
-//       e.registration_council = "Registration council required";
-//     if (!form.qualifications) e.qualifications = "Qualifications required";
-//     if (!form.license_document) e.license_document = "License document required";
-
-//     setErrors(e);
-//     if (Object.keys(e).length) {
-//       toast.error(Object.values(e)[0]);
-//       return false;
-//     }
-//     return true;
-//   }
-
-//   async function handleFileUpload(
-//   e: React.ChangeEvent<any>,
-//   field: "profile_photo" | "license_document"
-// ) {
-//   const input = e.target as HTMLInputElement;
-//   const file = input.files?.[0];
-//   if (!file) return;
-
-//   const url = await upload(file);
-
-//   setForm(prev => ({
-//     ...prev,
-//     [field]: url,
-//   }));
-// }
-
-//   /* ================= SUBMIT ================= */
-
-//   async function handleSubmit(e: React.FormEvent) {
-//     e.preventDefault();
-//     if (!validate()) return;
-
-//     setSaving(true);
-
-//     const payload: any = { ...form };
-//     if (editId && !payload.password) delete payload.password;
-
-//     const res = await fetch(
-//       editId ? `/api/admin/doctors/${editId}` : "/api/admin/doctors",
-//       {
-//         method: editId ? "PUT" : "POST",
-//         credentials: "include", // 🔥 VERY IMPORTANT
-//         headers: {
-//           "Content-Type": "application/json",
-//           ...getAuthHeader(),
-//         },
-//         body: JSON.stringify(payload),
-        
-//       }
-//     );
-//     console.log("ROLE =", payload.role);
-
-//     const j = await res.json();
-//     setSaving(false);
-
-//     if (!j.status) {
-//       if (j.errors) {
-//         setErrors(j.errors);
-//         toast.error(String(Object.values(j.errors)[0]));
-//       } else {
-//         toast.error(j.message || "Failed");
-//       }
-//       return;
-//     }
-
-//     toast.success(editId ? "Doctor updated" : "Doctor added");
-//     router.push("/admin/doctors");
-//   }
-
-  
-
-  
-
-//   /* ================= UI ================= */
-
-//   return (
-//     <>
-//       <Seo title="Doctor" />
-//       <Pageheader title="Doctors" currentpage="Doctor Form" activepage="Doctors" />
-
-//       <form onSubmit={handleSubmit}>
-//         <Card className="custom-card">
-//           <Card.Header>
-//             <div className="card-title">
-//               {editId ? "Edit Doctor" : "Add Doctor"}
-//             </div>
-//           </Card.Header>
-
-//           <Card.Body>
-//             <Row className="gy-3">
-
-//               {/* BASIC */}
-//               <Col xl={4}><Form.Control placeholder="Aadhaar *" value={form.aadhaar} onChange={e=>setForm({...form,aadhaar:e.target.value})}/></Col>
-//               <Col xl={4}><Form.Control placeholder="Phone *" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></Col>
-//               <Col xl={4}><Form.Control placeholder="Email *" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></Col>
-
-//               <Col xl={6}><Form.Control placeholder="First Name *" value={form.first_name} onChange={e=>setForm({...form,first_name:e.target.value})}/></Col>
-//               <Col xl={6}><Form.Control placeholder="Last Name *" value={form.last_name} onChange={e=>setForm({...form,last_name:e.target.value})}/></Col>
-
-//               {!editId && (
-//                 <Col xl={6}>
-//                     <Form.Label>Password *</Form.Label>
-//                   <Form.Control type="password" placeholder="Password *"
-//                     value={form.password}
-//                     onChange={e=>setForm({...form,password:e.target.value})}/>
-//                 </Col>
-//               )}
-
-//  <Col xl={6}>
-//   <Form.Label>Specialty *</Form.Label>
-
-//   <SpkSelect
-//     key={form.specialty}   // 🔴 VERY IMPORTANT
-//     option={specialties}
-//     defaultvalue={
-//       specialties.find(s => s.value === form.specialty)
-//         ? [specialties.find(s => s.value === form.specialty)!]
-//         : []
-//     }
-//     {...({
-//       onChange: (o: any) => {
-//         const val = Array.isArray(o) ? o[0]?.value : o?.value;
-
-//         setForm(prev => ({
-//           ...prev,
-//           specialty: val || "",
-//         }));
-
-//         // error clear
-//         setErrors(prev => {
-//           const e = { ...prev };
-//           delete e.specialty;
-//           return e;
-//         });
-//       },
-//     } as any)}
-//     classNameprefix="Select2"
-//     menuplacement="auto"
-//   />
-
-//   {errors.specialty && (
-//     <small className="text-danger">{errors.specialty}</small>
-//   )}
-// </Col>
-
-
-
-
-//               {/* MEDICAL */}
-//               <Col xl={4}><Form.Control placeholder="Medical Reg No *" value={form.medical_registration_number} onChange={e=>setForm({...form,medical_registration_number:e.target.value})}/></Col>
-//               <Col xl={4}><Form.Control placeholder="Registration Council *" value={form.registration_council} onChange={e=>setForm({...form,registration_council:e.target.value})}/></Col>
-//               <Col xl={4}><Form.Control placeholder="Qualifications *" value={form.qualifications} onChange={e=>setForm({...form,qualifications:e.target.value})}/></Col>
-
-//               {/* FILES */}
-//               <Col xl={6}>
-//                   <Form.Control type="file" accept="image/*" onChange={e => handleFileUpload(e, "profile_photo")} />
-//               </Col>
-
-//               <Col xl={6}>
-//                   <Form.Control type="file" accept=".pdf,.jpg,.png" onChange={e => handleFileUpload(e, "license_document")} />
-//               </Col>
-
-//               {/* Address */}
-              
-//               <Col xl={3}><SpkSelect option={countries}
-//                 defaultvalue={countries.filter(c=>c.value===form.country)}
-//                 {...({ onChange:(o:any)=>setForm({...form,country:o?.value}) } as any)} /></Col>
-
-//               <Col xl={3}><SpkSelect option={states}
-//                 defaultvalue={states.filter(s=>s.value===form.state)}
-//                 {...({ onChange:(o:any)=>setForm({...form,state:o?.value}) } as any)} /></Col>
-
-//               <Col xl={3}><SpkSelect option={districts}
-//                 defaultvalue={districts.filter(d=>d.value===form.district)}
-//                 {...({ onChange:(o:any)=>setForm({...form,district:o?.value}) } as any)} /></Col>
-
-//               <Col xl={3}><Form.Control placeholder="City"
-//                 value={form.city}
-//                 onChange={e=>setForm({...form,city:e.target.value})} /></Col>
-
-//               {/* Bio */}
-//               <Col xl={12}>
-//                 <Form.Control as="textarea" rows={3} placeholder="Bio (max 500 chars)"
-//                   value={form.bio}
-//                   onChange={e=>setForm({...form,bio:e.target.value})} />
-//               </Col>
-
-//               {/* Active */}
-//               <Col xl={12}>
-//                 <Form.Check type="switch" label="Active"
-//                   checked={form.is_active}
-//                   onChange={e=>setForm({...form,is_active:e.target.checked})} />
-//               </Col>
-
-//               <Col xl={12}>
-//                 <SpkButton Buttontype="submit" Customclass="btn btn-primary" Disabled={saving || checking}>
-//                   {saving ? "Saving..." : editId ? "Update Doctor" : "Save Doctor"}
-//                 </SpkButton>
-//               </Col>
-
-//             </Row>
-//           </Card.Body>
-//         </Card>
-//       </form>
-//     </>
-//   );
-// }
-
 "use client";
 
 import React, { Fragment, useEffect, useState } from "react";
@@ -410,6 +43,11 @@ export default function AdminAddEditDoctorPage() {
     password: "", // admin provides password when creating
     preferred_language: "",
     specialty: "",
+    medical_registration_number: "",
+    registration_council: "",
+    qualifications: "",
+    years_experience: "",
+    clinic_id: "",
     address: { line1: "", line2: "", city: "", pincode: "", country: "", state: "", district: "" },
     national_id: "",
     profile_photo: "", // url
@@ -526,6 +164,12 @@ export default function AdminAddEditDoctorPage() {
         password: "", // keep empty for edit
         preferred_language: p.preferred_language?._id || p.preferred_language || "",
         specialty: p.specialty?._id || p.specialty || "",
+        medical_registration_number: p.medical_registration_number || "",
+        registration_council: p.registration_council || "",
+        qualifications: p.qualifications || "",
+        years_experience: p.years_experience || "",
+        clinic_id: p.clinic_id || "",
+
         address: {
           line1: address.line1 || "",
           line2: address.line2 || "",
@@ -608,12 +252,15 @@ export default function AdminAddEditDoctorPage() {
     if (!form.last_name || !nameRegex.test(form.last_name)) e.last_name = "Last name required (1-80 letters/hyphen).";
 
     // email conditional recommended
+    if (!form.email) e.email = "Email is required.";
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) e.email = "Invalid email format.";
 
     // phone basic check E.164-ish
+    
     if (!form.phone || !/^\+?[0-9]{7,15}$/.test(form.phone)) e.phone = "Phone required in digits (E.164-ish).";
 
     // aadhaar
+     if (!form.aadhaar) e.aadhaar = "Aadhaar is required.";
     if (form.aadhaar && !/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Aadhaar must be 12 digits.";
 
     // password only required when creating new (admin provides or set-password flow)
@@ -626,7 +273,21 @@ export default function AdminAddEditDoctorPage() {
 
     // specialty required
     if (!form.specialty) e.specialty = "Specialty is required.";
+    
+    // medical_registration_number required
+    if (!form.medical_registration_number) e.medical_registration_number = "Medical registration is required.";
+    
+    // registration_council required
+    if (!form.registration_council) e.registration_council = "Registration council is required.";
 
+    // qualifications required
+    if (!form.qualifications) e.qualifications = "Qualifications is required.";
+
+    // years_experience required
+    if (!form.years_experience) e.years_experience = "Years experience is required.";
+
+    // clinic_id required
+    if (!form.clinic_id) e.clinic_id = "Clinic id is required.";
     // pincode digits if provided
     if (form.address?.pincode && !/^[0-9]{4,10}$/.test(form.address.pincode)) e.pincode = "Invalid pincode.";
 
@@ -699,12 +360,17 @@ export default function AdminAddEditDoctorPage() {
         first_name: form.first_name,
         middle_name: form.middle_name,
         last_name: form.last_name,
-        email: form.email || undefined,
+        email: form.email,
         phone: form.phone,
-        aadhaar: form.aadhaar || undefined,
+        aadhaar: form.aadhaar,
         password: form.password || undefined,
         preferred_language: form.preferred_language || undefined,
         specialty: form.specialty,
+        medical_registration_number: form.medical_registration_number,
+        registration_council: form.registration_council,
+        qualifications: form.qualifications,   
+        years_experience: form.years_experience,
+        clinic_id: form.clinic_id,
         address: {
           line1: form.address.line1,
           line2: form.address.line2,
@@ -825,7 +491,7 @@ export default function AdminAddEditDoctorPage() {
 
                   {/* email / phone / aadhaar */}
                   <Col xl={4}>
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label>Email *</Form.Label>
                     <Form.Control
                       type="email"
                       value={form.email}
@@ -854,7 +520,7 @@ export default function AdminAddEditDoctorPage() {
                   </Col>
 
                   <Col xl={4}>
-                    <Form.Label>Aadhaar</Form.Label>
+                    <Form.Label>Aadhaar *</Form.Label>
                     <Form.Control
                       value={form.aadhaar}
                       onChange={(e) => { setForm({ ...form, aadhaar: e.target.value }); setAadhaarStatus("idle"); }}
@@ -887,8 +553,6 @@ export default function AdminAddEditDoctorPage() {
 
 <Col xl={6}>
   <Form.Label>Specialties *</Form.Label>
-
-  {/* quick TS bypass: treat SpkSelect props as any so onChange allowed */}
   <SpkSelect
     {...({
       option: specialty,
@@ -904,6 +568,56 @@ export default function AdminAddEditDoctorPage() {
   />
 
   {errors.specialty && <div className="text-danger small mt-1">{errors.specialty}</div>}
+</Col>
+
+<Col xl={4}>
+                    <Form.Label>Medical Registration Number *</Form.Label>
+                    <Form.Control
+                      value={form.medical_registration_number}
+                      onChange={(e) => setForm({ ...form, medical_registration_number: e.target.value })}
+                      isInvalid={!!errors.medical_registration_number}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.medical_registration_number}</Form.Control.Feedback>
+</Col>
+
+<Col xl={4}>
+                    <Form.Label>Registration Council *</Form.Label>
+                    <Form.Control
+                      value={form.registration_council}
+                      onChange={(e) => setForm({ ...form, registration_council: e.target.value })}
+                      isInvalid={!!errors.registration_council}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.registration_council}</Form.Control.Feedback>
+</Col>
+
+<Col xl={4}>
+                    <Form.Label>Qualifications *</Form.Label>
+                    <Form.Control
+                      value={form.qualifications}
+                      onChange={(e) => setForm({ ...form, qualifications: e.target.value })}
+                      isInvalid={!!errors.qualifications}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.qualifications}</Form.Control.Feedback>
+</Col>
+
+<Col xl={4}>
+                    <Form.Label>Years Experience *</Form.Label>
+                    <Form.Control
+                      value={form.years_experience}
+                      onChange={(e) => setForm({ ...form, years_experience: e.target.value })}
+                      isInvalid={!!errors.years_experience}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.years_experience}</Form.Control.Feedback>
+</Col>
+
+<Col xl={4}>
+                    <Form.Label>Clinic id *</Form.Label>
+                    <Form.Control
+                      value={form.clinic_id}
+                      onChange={(e) => setForm({ ...form, clinic_id: e.target.value })}
+                      isInvalid={!!errors.clinic_id}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.clinic_id}</Form.Control.Feedback>
 </Col>
 
                   {/* Preferred Language (fixed) */}

@@ -313,22 +313,20 @@ const DoctorSchema = new Schema<IDoctor>(
       required: [true, "Qualifications are required"],
       trim: true,
     },
-    specialty: {
-      type: String,
-      required: [true, "Specialty is required"],
-      trim: true,
-    },
+   
     years_experience: {
       type: Number,
       min: 0,
     },
-
- 
     clinic_id: {
       type: String,
       trim: true,
     },
-
+ specialty: {
+      type: String,
+      required: [true, "Specialty is required"],
+      trim: true,
+    },
     
     address: {
       country: {
@@ -419,6 +417,13 @@ export interface IDoctorMaster extends Document {
   password: string; // hashed
   preferred_language?: Types.ObjectId;
   specialty?: Types.ObjectId;
+  medical_registration_number: string;
+  registration_council: string;
+  qualifications: string;
+  years_experience?: number;
+  clinic_id?: string;
+
+
   address?: IDoctorAddress;
   national_id?: string;
   profile_photo?: string;
@@ -460,6 +465,32 @@ const DoctorMasterSchema = new Schema<IDoctorMaster>(
     password: { type: String, required: true },
     preferred_language: { type: Schema.Types.ObjectId, ref: "LanguageMaster" },
     specialty: { type: Schema.Types.ObjectId, ref: "SpecialtiesMaster" },
+    medical_registration_number: {
+      type: String,
+      required: [true, "Medical registration number is required"],
+      unique: true,
+      trim: true,
+    },
+    registration_council: {
+      type: String,
+      required: [true, "Registration council is required"],
+      trim: true,
+    },
+    qualifications: {
+      type: String,
+      required: [true, "Qualifications are required"],
+      trim: true,
+    },
+   
+    years_experience: {
+      type: Number,
+      min: 0,
+    },
+    clinic_id: {
+      type: String,
+      trim: true,
+    },
+    
     address: { type: DoctorAddressSchema },
     national_id: { type: String, trim: true },
     profile_photo: { type: String, trim: true },

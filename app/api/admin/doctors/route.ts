@@ -1,181 +1,3 @@
-// import { NextRequest } from "next/server";
-// import mongoose from "mongoose";
-// import bcrypt from "bcrypt";
-// import DoctorMaster from "@/models/DoctorMaster";
-// import { connectMongo } from "@/lib/mongoose";
-// import { verifyAccessToken } from "@/lib/jwt";
-
-// /*------------------------*/
-// async function requireAdmin(req: NextRequest) {
-// const cookieHeader = req.headers.get("cookie") || "";
-// let tokenFromCookie = "";
-// if (cookieHeader) {
-//   const cookies = Object.fromEntries(cookieHeader.split(';').map(s => s.trim().split('=')));
-//   tokenFromCookie = cookies['accessToken'] || cookies['access_token'] || cookies['jwt'] || "";
-// }
-// const authHeader = req.headers.get("authorization") || (tokenFromCookie ? `Bearer ${tokenFromCookie}` : "");
-// // then use authHeader same as before:
-// if (!authHeader.startsWith("Bearer ")) {
-//      throw { status: 401, message: "Unauthorized" };
-// }
-
-//  const payload: any = await verifyAccessToken(authHeader.replace("Bearer ", ""));
-//   if (!payload || payload.role !== "admin") {
-//     throw { status: 403, message: "Admin access only" };
-//   }
-
-//   return payload;
-// }
-// // const token = authHeader.split(" ")[1];
-
-// /* ---------------- AUTH ---------------- *
-// async function requireAdmin(req: NextRequest) {
-//   const auth =
-//     req.headers.get("authorization") ||
-//     (req.headers.get("cookie") || "").includes("accessToken")
-//       ? `Bearer ${(req.headers.get("cookie") || "").split("accessToken=")[1]}`
-//       : "";
-
-//   if (!auth.startsWith("Bearer ")) {
-//     throw { status: 401, message: "Unauthorized" };
-//   }
-
-//   const payload: any = await verifyAccessToken(auth.replace("Bearer ", ""));
-//   if (!payload || payload.role !== "admin") {
-//     throw { status: 403, message: "Admin access only" };
-//   }
-
-//   return payload;
-// }
-
-// /* ---------------- GET : LIST ---------------- */
-// export async function GET(req: NextRequest) {
-//   try {
-//     await connectMongo();
-//     await requireAdmin(req);
-
-//     const { searchParams } = new URL(req.url);
-
-//     const page = Number(searchParams.get("page") || 1);
-//     const limit = Number(searchParams.get("limit") || 10);
-//     const search = (searchParams.get("search") || "").trim();
-//     const sortBy = searchParams.get("sortBy") || "createdAt";
-//     const sortDir = searchParams.get("sortDir") === "asc" ? 1 : -1;
-
-//     const filter: any = {};
-//     if (search) {
-//       const re = new RegExp(search, "i");
-//       filter.$or = [
-//         { first_name: re },
-//         { last_name: re },
-//         { email: re },
-//         { phone: re },
-//         { medical_registration_number: re },
-//       ];
-//     }
-
-//     const skip = (page - 1) * limit;
-
-//     const [total, rows] = await Promise.all([
-//       DoctorMaster.countDocuments(filter),
-//       DoctorMaster.find(filter)
-//         .sort({ [sortBy]: sortDir })
-//         .skip(skip)
-//         .limit(limit)
-//         .lean(),
-//     ]);
-
-//     return Response.json({
-//       status: true,
-//       message: "Doctors list",
-//       data: { total, page, limit, rows },
-//     });
-//   } catch (e: any) {
-//     return Response.json(
-//       { status: false, message: e.message || "Server error" },
-//       { status: e.status || 500 }
-//     );
-//   }
-// }
-
-// /* ---------------- POST : CREATE ---------------- */
-// export async function POST(req: NextRequest) {
-//   try {
-//     await connectMongo();
-//     await requireAdmin(req);
-
-//     const payload = await req.json();
-
-//     const errors: Record<string, string> = {};
-
-//     if (!payload.first_name) errors.first_name = "First name is required";
-//     if (!payload.last_name) errors.last_name = "Last name is required";
-//     if (!payload.email) errors.email = "Email is required";
-//     if (!payload.phone) errors.phone = "Phone is required";
-//     if (!payload.aadhaar) errors.aadhaar = "Aadhaar is required";
-//     if (!payload.password) errors.password = "Password is required";
-
-//     if (!payload.medical_registration_number)
-//       errors.medical_registration_number = "Medical registration number is required";
-
-//     if (!payload.registration_council)
-//       errors.registration_council = "Registration council is required";
-
-//     if (!payload.qualifications)
-//       errors.qualifications = "Qualifications are required";
-
-//     // if (!payload.specialty)
-//     //   errors.specialty = "Specialty is required";
-
-//     if (!payload.license_document)
-//       errors.license_document = "License document is required";
-
-//     if (Object.keys(errors).length > 0) {
-//       return Response.json(
-//         { status: false, message: "Validation failed", errors },
-//         { status: 422 }
-//       );
-//     }
-
-//     const exists = await DoctorMaster.findOne({
-//       $or: [
-//         { email: payload.email },
-//         { phone: payload.phone },
-//         { aadhaar: payload.aadhaar },
-//         { medical_registration_number: payload.medical_registration_number },
-//       ],
-//     });
-
-//     if (exists) {
-//       return Response.json(
-//         { status: false, message: "Doctor already exists" },
-//         { status: 409 }
-//       );
-//     }
-
-//     const hashed = await bcrypt.hash(payload.password, 10);
-
-//     const doc = await DoctorMaster.create({
-//       ...payload,
-//       password: hashed,
-//       verified: "Pending",
-//       is_active: payload.is_active !== false,
-//     });
-
-//     return Response.json({
-//       status: true,
-//       message: "Doctor created successfully",
-//       data: doc,
-//     });
-//   } catch (e: any) {
-//     console.error("POST /doctors error", e);
-//     return Response.json(
-//       { status: false, message: e.message || "Server error" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
 import { connectMongo } from "@/lib/mongoose";
 import DoctorMaster from "@/models/DoctorMaster";
 import { success, error } from "@/lib/response";
@@ -235,6 +57,11 @@ const token = authHeader.split(" ")[1];
     const aadhaar = body.aadhaar ? body.aadhaar.toString().trim() : "";
     const passwordRaw = body.password ? body.password.toString() : cryptoRandomPassword();
     const preferred_language = body.preferred_language || null;
+    const medical_registration_number = (body.medical_registration_number || "").trim();
+    const registration_council = (body.registration_council || "").trim();
+    const qualifications = (body.qualifications || "").trim();
+    const years_experience = (body.years_experience || "").trim();
+    const clinic_id = (body.clinic_id || "").trim();
     const specialty = body.specialty || null;
     const address = body.address || {};
     const profile_photo = body.profile_photo || null;
@@ -264,6 +91,11 @@ const token = authHeader.split(" ")[1];
       const a = await DoctorMaster.findOne({ aadhaar }).select("_id").lean();
       if (a) return error("Aadhaar already registered.", { aadhaar: "Aadhaar already registered" }, 409);
     }
+    if (!medical_registration_number) v.medical_registration_number = "Medical registration number is required.";
+    if (!registration_council) v.registration_council = "Registration council is required.";
+    if (!qualifications) v.qualifications = "Qualifications is required.";
+    if (!years_experience) v.years_experience = "Experience is required.";
+    if (!clinic_id) v.clinic_id = "Clinic id is required.";
 
     const hashed = await bcrypt.hash(passwordRaw, SALT_ROUNDS);
 
@@ -283,6 +115,11 @@ const token = authHeader.split(" ")[1];
       password: hashed,
       preferred_language: mongoose.Types.ObjectId.isValid(preferred_language) ? preferred_language : undefined,
       specialty: mongoose.Types.ObjectId.isValid(specialty) ? specialty : undefined,
+      medical_registration_number,
+      registration_council,
+      qualifications,
+      years_experience,
+      clinic_id,
       address: address || {},
       profile_photo: profile_photo || undefined,
       consent_whatsapp,
