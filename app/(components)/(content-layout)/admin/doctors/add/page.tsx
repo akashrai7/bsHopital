@@ -49,9 +49,11 @@ export default function AdminAddEditDoctorPage() {
     years_experience: "",
     clinic_id: "",
     address: { line1: "", line2: "", city: "", pincode: "", country: "", state: "", district: "" },
-    national_id: "",
+   
     profile_photo: "", // url
     profile_photo_file: null as File | null,
+    license_document: "",
+    license_document_file: null as File | null,
     consent_whatsapp: false,
     terms_accepted: false,
     admin_notes: "",
@@ -179,8 +181,8 @@ export default function AdminAddEditDoctorPage() {
           state: address.state?._id || address.state || "",
           district: address.district?._id || address.district || "",
         },
-        national_id: p.national_id || "",
-        profile_photo: p.profile_photo || "",
+        profile_photo: p.profile_photo || "", 
+        license_document: p.license_document || "",
         consent_whatsapp: !!p.consent_whatsapp,
         terms_accepted: !!p.terms_accepted,
         admin_notes: p.admin_notes || "",
@@ -333,7 +335,44 @@ export default function AdminAddEditDoctorPage() {
       return "";
     }
   }
+// upload license_document
+ async function handleLicenseUpload(file?: File | null) {
+    if (!file) return "";
+    if (!["image/jpeg", "application/pdf", "image/jpg"].includes(file.type)) {
+      toast.error("Invalid image type (jpg/pdf)");
+      return "";
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Max size 5MB");
+      return "";
+    }
 
+    const fd = new FormData();
+    fd.append("file", file);
+
+    try {
+      const headers: HeadersInit = {};
+      const auth = getAuthHeader();
+      if (auth.Authorization) (headers as Record<string, string>)["Authorization"] = auth.Authorization;
+
+      const res = await fetch("/api/upload/doctor-license", {
+        method: "POST",
+        body: fd,
+        // DO NOT set Content-Type for FormData; browser will set boundary
+        headers,
+      });
+      const data = await res.json();
+      if (!data?.status) {
+        toast.error(data?.message || "Upload failed");
+        return "";
+      }
+      return data.data?.url || "";
+    } catch (err) {
+      console.error("file upload", err);
+      toast.error("Upload failed");
+      return "";
+    }
+  }
   // submit
   async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
@@ -350,6 +389,16 @@ export default function AdminAddEditDoctorPage() {
       if ((form as any).profile_photo_file instanceof File) {
         const uploaded = await handlePhotoUpload((form as any).profile_photo_file);
         if (uploaded) profilePhotoUrl = uploaded;
+        else {
+          setSaving(false);
+          return;
+        }
+      }
+
+      let licenseDocumentUrl = form.license_document;
+      if ((form as any).license_document_file instanceof File) {
+        const uploaded = await handleLicenseUpload((form as any).license_document_file);
+        if (uploaded) licenseDocumentUrl = uploaded;
         else {
           setSaving(false);
           return;
@@ -380,8 +429,8 @@ export default function AdminAddEditDoctorPage() {
           state: form.address.state || undefined,
           district: form.address.district || undefined,
         },
-        national_id: form.national_id || undefined,
         profile_photo: profilePhotoUrl || undefined,
+        license_document: licenseDocumentUrl || undefined,
         consent_whatsapp: !!form.consent_whatsapp,
         terms_accepted: !!form.terms_accepted,
         admin_notes: form.admin_notes || undefined,
@@ -444,6 +493,10 @@ export default function AdminAddEditDoctorPage() {
   function onPhotoFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] || null;
     setForm((prev: any) => ({ ...prev, profile_photo_file: file, profile_photo: file ? "" : prev.profile_photo }));
+  }
+function onLicenseChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] || null;
+    setForm((prev: any) => ({ ...prev, license_document_file: file, license_document: file ? "" : prev.license_document }));
   }
 
   return (
@@ -550,8 +603,31 @@ export default function AdminAddEditDoctorPage() {
                   )}
 
                   {/* specialty (fixed) */}
-
+                  {/* Preferred Language (fixed) */}
 <Col xl={6}>
+  <Form.Label>Preferred Language</Form.Label>
+  <SpkSelect
+    {...({
+      option: languages,
+      defaultvalue: languages.find((r) => r.value === form.preferred_language)
+        ? [languages.find((r) => r.value === form.preferred_language)]
+        : [],
+      key: `rel-${form.preferred_language || "new"}`,
+      onChange: (opt: any) => setForm({ ...form, preferred_language: opt?.value || "" }),
+      placeholder: "Select languages",
+      classNameprefix: "Select2",
+      menuplacement: "auto",
+    } as any)}
+  />
+</Col>
+
+{/* Medical fields */}
+                  <Col xl={12}>
+                    <Form.Label>Medical</Form.Label>
+                  </Col>
+
+
+<Col xl={4}>
   <Form.Label>Specialties *</Form.Label>
   <SpkSelect
     {...({
@@ -569,7 +645,7 @@ export default function AdminAddEditDoctorPage() {
 
   {errors.specialty && <div className="text-danger small mt-1">{errors.specialty}</div>}
 </Col>
-
+ 
 <Col xl={4}>
                     <Form.Label>Medical Registration Number *</Form.Label>
                     <Form.Control
@@ -620,23 +696,7 @@ export default function AdminAddEditDoctorPage() {
                     <Form.Control.Feedback type="invalid">{errors.clinic_id}</Form.Control.Feedback>
 </Col>
 
-                  {/* Preferred Language (fixed) */}
-<Col xl={6}>
-  <Form.Label>Preferred Language</Form.Label>
-  <SpkSelect
-    {...({
-      option: languages,
-      defaultvalue: languages.find((r) => r.value === form.preferred_language)
-        ? [languages.find((r) => r.value === form.preferred_language)]
-        : [],
-      key: `rel-${form.preferred_language || "new"}`,
-      onChange: (opt: any) => setForm({ ...form, preferred_language: opt?.value || "" }),
-      placeholder: "Select languages",
-      classNameprefix: "Select2",
-      menuplacement: "auto",
-    } as any)}
-  />
-</Col>
+
                   {/* address fields */}
                   <Col xl={12}>
                     <Form.Label>Address</Form.Label>
@@ -723,15 +783,7 @@ export default function AdminAddEditDoctorPage() {
                     <Form.Control.Feedback type="invalid">{errors.pincode}</Form.Control.Feedback>
                   </Col>
 
-                  {/* national id */}
-                  <Col xl={6}>
-                    <Form.Label>Gov. ID (national_id)</Form.Label>
-                    <Form.Control
-                      value={form.national_id}
-                      onChange={(e) => setForm({ ...form, national_id: e.target.value })}
-                    />
-                  </Col>
-
+                  
                   {/* profile photo */}
                   <Col xl={6}>
                     <Form.Label>Profile Photo</Form.Label>
@@ -750,8 +802,26 @@ export default function AdminAddEditDoctorPage() {
                     )}
                   </Col>
 
+                      {/* license_document */}
+                  <Col xl={6}>
+                    <Form.Label>License document</Form.Label>
+                    <InputGroup>
+                      <Form.Control type="file"  onChange={onLicenseChange} />
+                    </InputGroup>
+                    {form.license_document && !form.license_document_file && (
+                      <div className="mt-2">
+                        <img src={form.license_document} alt="photo" style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 6 }} />
+                      </div>
+                    )}
+                    {form.license_document_file && (
+                      <div className="mt-2">
+                        <small className="text-muted">Ready to upload: { (form.license_document_file as File).name }</small>
+                      </div>
+                    )}
+                  </Col>
+
                   {/* consent & terms */}
-                  <Col xl={6} className="mt-2">
+                  <Col xl={7} className="mt-2">
                     <Form.Check
                       type="checkbox"
                       id="consent_whatsapp"
@@ -761,7 +831,7 @@ export default function AdminAddEditDoctorPage() {
                     />
                   </Col>
 
-                  <Col xl={6} className="mt-2">
+                  <Col xl={5} className="mt-2">
                     <Form.Check
                       type="checkbox"
                       id="terms_accept"

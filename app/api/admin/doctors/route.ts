@@ -65,6 +65,7 @@ const token = authHeader.split(" ")[1];
     const specialty = body.specialty || null;
     const address = body.address || {};
     const profile_photo = body.profile_photo || null;
+    const license_document = body.license_document || null;
     const consent_whatsapp = !!body.consent_whatsapp;
     const terms_accepted = !!body.terms_accepted;
 
@@ -122,6 +123,7 @@ const token = authHeader.split(" ")[1];
       clinic_id,
       address: address || {},
       profile_photo: profile_photo || undefined,
+      license_document: license_document || undefined,
       consent_whatsapp,
       consent_whatsapp_ts: consent_whatsapp ? new Date() : null,
       terms_accepted,

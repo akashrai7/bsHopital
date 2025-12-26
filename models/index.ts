@@ -7,5 +7,6 @@ import "./DistrictMaster";
 import "./LanguageMaster";
 import "./RelationshipTypeMaster";
 import "./ParentMaster";
+import "./SpecialtiesMaster";
 // ... add other master models you have
 // No export needed — we just want side-effectful imports

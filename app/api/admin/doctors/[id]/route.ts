@@ -1,6 +1,7 @@
 // /app/api/admin/doctors/[id]/route.ts
 import { connectMongo } from "@/lib/mongoose";
 import DoctorMaster from "@/models/DoctorMaster";
+import SpecialtiesMaster from "@/models/SpecialtiesMaster";
 import { success, error } from "@/lib/response";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
@@ -78,7 +79,7 @@ export async function GET(req: Request, context: { params: any }) {
 
     const doc = await DoctorMaster.findById(id)
       .populate("preferred_language", "name code")
-      .populate("specialty", "name code")
+      
       .populate("address.country", "name code")
       .populate("address.state", "name code")
       .populate("address.district", "name code")
@@ -126,9 +127,16 @@ export async function PUT(req: Request, context: { params: any }) {
     if (typeof body.aadhaar === "string") updates.aadhaar = body.aadhaar.trim() || undefined;
     if (typeof body.preferred_language === "string" && mongoose.Types.ObjectId.isValid(body.preferred_language)) updates.preferred_language = body.preferred_language;
     if (typeof body.specialty === "string" && mongoose.Types.ObjectId.isValid(body.specialty)) updates.specialty = body.specialty;
+    
+    if (typeof body.medical_registration_number === "string") updates.medical_registration_number = body.medical_registration_number.trim();
+    if (typeof body.registration_council === "string") updates.registration_council = body.registration_council.trim();
+    if (typeof body.qualifications === "string") updates.qualifications = body.qualifications.trim();
+    if (typeof body.years_experience === "string") updates.years_experience = body.years_experience.trim();
+    if (typeof body.clinic_id === "string") updates.clinic_id = body.clinic_id.trim();
+
     if (body.address && typeof body.address === "object") updates.address = body.address;
-    if (typeof body.national_id === "string") updates.national_id = body.national_id || undefined;
     if (typeof body.profile_photo === "string") updates.profile_photo = body.profile_photo || undefined;
+    if (typeof body.license_document === "string") updates.license_document = body.license_document || undefined;
     if (typeof body.consent_whatsapp === "boolean") {
       updates.consent_whatsapp = body.consent_whatsapp;
       updates.consent_whatsapp_ts = body.consent_whatsapp ? new Date() : null;
@@ -171,7 +179,7 @@ export async function PUT(req: Request, context: { params: any }) {
 
     const doc = await DoctorMaster.findByIdAndUpdate(id, { $set: updates }, { new: true })
       .populate("preferred_language", "name code")
-      .populate("specialty", "name code")
+     
       .populate("address.country", "name code")
       .populate("address.state", "name code")
       .populate("address.district", "name code")

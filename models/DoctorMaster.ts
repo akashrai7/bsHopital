@@ -425,8 +425,8 @@ export interface IDoctorMaster extends Document {
 
 
   address?: IDoctorAddress;
-  national_id?: string;
   profile_photo?: string;
+  license_document?: String;
   consent_whatsapp?: boolean;
   consent_whatsapp_ts?: Date | null;
   consent_whatsapp_ip?: string | null;
@@ -492,8 +492,8 @@ const DoctorMasterSchema = new Schema<IDoctorMaster>(
     },
     
     address: { type: DoctorAddressSchema },
-    national_id: { type: String, trim: true },
     profile_photo: { type: String, trim: true },
+    license_document: { type: String, required: true },
     consent_whatsapp: { type: Boolean, default: false },
     consent_whatsapp_ts: { type: Date, default: null },
     consent_whatsapp_ip: { type: String, default: null },
