@@ -1,175 +1,15 @@
-// // "use client";
-
-// // import React, { useEffect, useState } from "react";
-// // import Seo from "@/shared/layouts-components/seo/seo";
-// // import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-// // import { Card, Col, Row, Table, Spinner } from "react-bootstrap";
-// // import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
-// // import { useRouter } from "next/navigation";
-// // import { toast } from "react-toastify";
-
-// // function getAuthHeader() {
-// //   try {
-// //     const t =
-// //       typeof window !== "undefined"
-// //         ? localStorage.getItem("accessToken") || ""
-// //         : "";
-// //     return t ? { Authorization: `Bearer ${t}` } : {};
-// //   } catch {
-// //     return {};
-// //   }
-// // }
-
-// // export default function ChildrenViewPage() {
-// //   const router = useRouter();
-
-// //   const [loading, setLoading] = useState(true);
-// //   const [rows, setRows] = useState<any[]>([]);
-
-// //   useEffect(() => {
-// //     fetchChildren();
-// //   }, []);
-
-// //   async function fetchChildren() {
-// //     setLoading(true);
-// //     try {
-// //       const res = await fetch("/api/admin/children", {
-// //          headers: { "Content-Type": "application/json" },
-// //          ...(getAuthHeader() as any),
-// //       });
-
-// //       const data = await res.json();
-
-// //       if (!data?.status) {
-// //         toast.error(data?.message || "Failed to load children");
-// //         return;
-// //       }
-
-// //       setRows(data.data.data || []);
-// //     } catch (err) {
-// //       console.error("fetchChildren error", err);
-// //       toast.error("Server error");
-// //     } finally {
-// //       setLoading(false);
-// //     }
-// //   }
-
-// //   return (
-// //     <>
-// //       <Seo title="Children" />
-// //       <Pageheader
-// //         title="Children"
-// //         currentpage="Children List"
-// //         activepage="Children"
-// //       />
-
-// //       <Row>
-// //         <Col xl={12}>
-// //           <Card className="custom-card">
-// //             <Card.Header className="d-flex justify-content-between align-items-center">
-// //               <div className="card-title">Children List</div>
-
-// //               <button
-// //                 className="btn btn-primary"
-// //                 onClick={() => router.push("/admin/children/add")}
-// //               >
-// //                 + Add Child
-// //               </button>
-// //             </Card.Header>
-
-// //             <Card.Body>
-// //               {loading ? (
-// //                 <div className="text-center py-5">
-// //                   <Spinner animation="border" />
-// //                 </div>
-// //               ) : (
-// //                 <Table bordered hover responsive>
-// //                   <thead className="table-light">
-// //                     <tr>
-// //                       <th>#</th>
-// //                       <th>Child ID</th>
-// //                       <th>Full Name</th>
-// //                       <th>DOB</th>
-// //                       <th>Gender</th>
-// //                       <th>Parent(s)</th>
-// //                       <th>Primary Contact</th>
-// //                       <th>Action</th>
-// //                     </tr>
-// //                   </thead>
-
-// //                   <tbody>
-// //                     {rows.length === 0 ? (
-// //                       <tr>
-// //                         <td colSpan={8} className="text-center text-muted">
-// //                           No records found
-// //                         </td>
-// //                       </tr>
-// //                     ) : (
-// //                       rows.map((r, i) => (
-// //                         <tr key={r._id}>
-// //                           <td>{i + 1}</td>
-// //                           <td>{r.child_id}</td>
-// //                           <td>{r.full_name}</td>
-// //                           <td>
-// //                             {r.dob
-// //                               ? new Date(r.dob).toLocaleDateString()
-// //                               : "-"}
-// //                           </td>
-// //                           <td>{r.gender_code || "-"}</td>
-// //                           <td>
-// //                             {(r.parent_ids || [])
-// //                               .map(
-// //                                 (p: any) =>
-// //                                   `${p.first_name} ${p.last_name}`
-// //                               )
-// //                               .join(", ") || "-"}
-// //                           </td>
-// //                           <td>{r.primary_contact || "-"}</td>
-
-// //                           <td>
-// //                            <button
-// //                               className="btn btn-sm btn-primary me-2"
-// //                               onClick={() =>
-// //                                 router.push(`/admin/children/add?id=${r._id}`)
-// //                               }
-// //                             >
-// //                               Edit
-// //                             </button>
-// //                           </td>
-// //                         </tr>
-// //                       ))
-// //                     )}
-// //                   </tbody>
-// //                 </Table>
-// //               )}
-// //             </Card.Body>
-// //           </Card>
-// //         </Col>
-// //       </Row>
-// //     </>
-// //   );
-// // }
-
-
 // "use client";
 
 // import React, { useEffect, useState } from "react";
+// import { Card, Row, Col, Table, Form, Button } from "react-bootstrap";
+// import { useRouter } from "next/navigation";
 // import Seo from "@/shared/layouts-components/seo/seo";
 // import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-// import { Card, Col, Row, Form, Table } from "react-bootstrap";
 // import { toast } from "react-toastify";
-// import { useRouter } from "next/navigation";
 
 // function getAuthHeader() {
-//   try {
-//     const t =
-//       typeof window !== "undefined"
-//         ? localStorage.getItem("accessToken") || ""
-//         : "";
-//     return t ? { Authorization: `Bearer ${t}` } : {};
-//   } catch {
-//     return {};
-//   }
+//   const t = typeof window !== "undefined" ? localStorage.getItem("accessToken") : "";
+//   return t ? { Authorization: `Bearer ${t}` } : {};
 // }
 
 // export default function ChildrenListPage() {
@@ -178,13 +18,11 @@
 //   const [rows, setRows] = useState<any[]>([]);
 //   const [loading, setLoading] = useState(false);
 
-//   // search + pagination
-//   const [search, setSearch] = useState("");
 //   const [page, setPage] = useState(1);
 //   const [limit] = useState(10);
 //   const [total, setTotal] = useState(0);
 
-//   // sorting
+//   const [search, setSearch] = useState("");
 //   const [sortBy, setSortBy] = useState("created_at");
 //   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -193,7 +31,7 @@
 //   useEffect(() => {
 //     fetchChildren();
 //     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [page, sortBy, sortDir]);
+//   }, [page, search, sortBy, sortDir]);
 
 //   async function fetchChildren() {
 //     setLoading(true);
@@ -207,232 +45,175 @@
 //       });
 
 //       const res = await fetch(`/api/admin/children?${qs.toString()}`, {
-//         headers: {
-//           "Content-Type": "application/json",
-//           ...(getAuthHeader() as any),
-//         },
+//         headers: { ...getAuthHeader() },
 //       });
 
-//       const data = await res.json();
-//       if (!data?.status) {
-//         toast.error(data?.message || "Failed to load children");
+//       const json = await res.json();
+
+//       if (!json?.status) {
+//         toast.error("Failed to load children");
 //         return;
 //       }
-// console.log("data", data);
-// console.log("ROWS:", data?.data?.data);
 
-//       setRows(data.data.data || []);
-//       setTotal(data.data.total || 0);
-//     } catch (err) {
-//       console.error(err);
+//       // ✅ CORRECT MAPPING (your issue fixed here)
+//       setRows(json.data.data || []);
+//       setTotal(json.data.total || 0);
+//     } catch (e) {
+//       console.error(e);
 //       toast.error("Server error");
 //     } finally {
 //       setLoading(false);
 //     }
 //   }
 
-//   function toggleSort(col: string) {
-//     if (sortBy === col) {
-//       setSortDir((p) => (p === "asc" ? "desc" : "asc"));
-//     } else {
-//       setSortBy(col);
-//       setSortDir("asc");
-//     }
-//     setPage(1);
-//   }
-
 //   async function handleDelete(id: string) {
-//     if (!confirm("Are you sure you want to delete this child?")) return;
+//     if (!confirm("Delete this child?")) return;
 
 //     try {
 //       const res = await fetch(`/api/admin/children/${id}`, {
 //         method: "DELETE",
-//         headers: {
-//           ...(getAuthHeader() as any),
-//         },
+//         headers: { ...getAuthHeader() },
 //       });
+//       const json = await res.json();
 
-//       const data = await res.json();
-//       if (!data?.status) {
-//         toast.error(data?.message || "Delete failed");
+//       if (!json?.status) {
+//         toast.error(json.message || "Delete failed");
 //         return;
 //       }
 
 //       toast.success("Child deleted");
 //       fetchChildren();
-//     } catch (err) {
-//       console.error(err);
+//     } catch (e) {
 //       toast.error("Server error");
+//     }
+//   }
+
+//   function toggleSort(field: string) {
+//     if (sortBy === field) {
+//       setSortDir(sortDir === "asc" ? "desc" : "asc");
+//     } else {
+//       setSortBy(field);
+//       setSortDir("asc");
 //     }
 //   }
 
 //   return (
 //     <>
 //       <Seo title="Children" />
-//       <Pageheader
-//         title="Children"
-//         currentpage="Children List"
-//         activepage="Children"
-//       />
+//       <Pageheader title="Children" currentpage="Children" activepage="Children" />
 
 //       <Row>
 //         <Col xl={12}>
 //           <Card className="custom-card">
-//             <Card.Header>
+//             <Card.Header className="d-flex justify-content-between">
 //               <div className="card-title">Children List</div>
+//               <Button onClick={() => router.push("/admin/children/add")}>
+//                 + Add Child
+//               </Button>
 //             </Card.Header>
 
 //             <Card.Body>
-//               {/* Search */}
 //               <Row className="mb-3">
-//                 <Col xl={4}>
+//                 <Col md={4}>
 //                   <Form.Control
-//                     placeholder="Search by name / ID / phone"
+//                     placeholder="Search name / ID / phone"
 //                     value={search}
-//                     onChange={(e) => setSearch(e.target.value)}
-//                     onKeyDown={(e) => {
-//                       if (e.key === "Enter") {
-//                         setPage(1);
-//                         fetchChildren();
-//                       }
+//                     onChange={(e) => {
+//                       setPage(1);
+//                       setSearch(e.target.value);
 //                     }}
 //                   />
 //                 </Col>
-
-//                 <Col xl={2}>
-//                   <button
-//                     className="btn btn-primary w-100"
-//                     onClick={() => {
-//                       setPage(1);
-//                       fetchChildren();
-//                     }}
-//                   >
-//                     Search
-//                   </button>
-//                 </Col>
-
-//                 <Col xl={2}>
-//                   <button
-//                     className="btn btn-outline-secondary w-100"
-//                     onClick={() => {
-//                       setSearch("");
-//                       setPage(1);
-//                       fetchChildren();
-//                     }}
-//                   >
-//                     Reset
-//                   </button>
-//                 </Col>
-
-//                 <Col xl={4} className="text-end">
-//                   <button
-//                     className="btn btn-success"
-//                     onClick={() => router.push("/admin/children/add")}
-//                   >
-//                     + Add Child
-//                   </button>
-//                 </Col>
 //               </Row>
 
-//               {/* Table */}
-//               <div className="table-responsive">
-//                 <Table bordered hover>
-//                   <thead>
+//               <Table bordered hover responsive>
+//                 <thead>
+//                   <tr>
+//                     <th onClick={() => toggleSort("child_id")}>Child ID</th>
+//                     <th onClick={() => toggleSort("full_name")}>Name</th>
+//                     <th>DOB</th>
+//                     <th>Gender</th>
+//                     <th>children</th>
+//                     <th>Contact</th>
+//                     <th width={140}>Actions</th>
+//                   </tr>
+//                 </thead>
+
+//                 <tbody>
+//                   {loading && (
 //                     <tr>
-//                       <th onClick={() => toggleSort("child_id")}>
-//                         Child ID
-//                       </th>
-//                       <th onClick={() => toggleSort("full_name")}>
-//                         Name
-//                       </th>
-//                       <th>Parents</th>
-//                       <th onClick={() => toggleSort("primary_contact")}>
-//                         Contact
-//                       </th>
-//                       <th>Actions</th>
+//                       <td colSpan={7} className="text-center">
+//                         Loading...
+//                       </td>
 //                     </tr>
-//                   </thead>
+//                   )}
 
-//                   <tbody>
-//                     {loading && (
-//                       <tr>
-//                         <td colSpan={5} className="text-center">
-//                           Loading...
-//                         </td>
-//                       </tr>
-//                     )}
+//                   {!loading && rows.length === 0 && (
+//                     <tr>
+//                       <td colSpan={7} className="text-center">
+//                         No records found
+//                       </td>
+//                     </tr>
+//                   )}
 
-//                     {!loading && rows.length === 0 && (
-//                       <tr>
-//                         <td colSpan={5} className="text-center">
-//                           No records found
-//                         </td>
-//                       </tr>
-//                     )}
-
-//                     {!loading &&
-//                       rows.map((r) => (
-//                         <tr key={r._id}>
-//                           <td>{r.child_id}</td>
-//                           <td>{r.full_name}</td>
-//                           <td>
-//                             {(r.parent_ids || [])
-//                               .map(
-//                                 (p: any) =>
-//                                   `${p.first_name} ${p.last_name}`
-//                               )
-//                               .join(", ")}
-//                           </td>
-//                           <td>{r.primary_contact || "-"}</td>
-//                           <td>
-//                             <button
-//                               className="btn btn-sm btn-primary me-2"
-//                               onClick={() =>
-//                                 router.push(
-//                                   `/admin/children/add?id=${r._id}`
-//                                 )
-//                               }
-//                             >
-//                               Edit
-//                             </button>
-
-//                             <button
-//                               className="btn btn-sm btn-danger"
-//                               onClick={() => handleDelete(r._id)}
-//                             >
-//                               Delete
-//                             </button>
-//                           </td>
-//                         </tr>
-//                       ))}
-//                   </tbody>
-//                 </Table>
-//               </div>
+//                   {rows.map((r) => (
+//                     <tr key={r._id}>
+//                       <td>{r.child_id}</td>
+//                       <td>{r.full_name}</td>
+//                       <td>{r.dob?.slice(0, 10)}</td>
+//                       <td>{r.gender_code}</td>
+//                       <td>
+//                         {Array.isArray(r.parent_ids)
+//                           ? r.parent_ids.map((p: any) => p.first_name).join(", ")
+//                           : "-"}
+//                       </td>
+//                       <td>{r.primary_contact || "-"}</td>
+//                       <td>
+//                         <Button
+//                           size="sm"
+//                           variant="warning"
+//                           className="me-2"
+//                           onClick={() =>
+//                             router.push(`/admin/children/add?id=${r._id}`)
+//                           }
+//                         >
+//                           Edit
+//                         </Button>
+//                         <Button
+//                           size="sm"
+//                           variant="danger"
+//                           onClick={() => handleDelete(r._id)}
+//                         >
+//                           Delete
+//                         </Button>
+//                       </td>
+//                     </tr>
+//                   ))}
+//                 </tbody>
+//               </Table>
 
 //               {/* Pagination */}
-//               <div className="d-flex justify-content-between align-items-center mt-3">
-//                 <div>
-//                   Page {page} of {totalPages} (Total: {total})
-//                 </div>
-
-//                 <div className="d-flex gap-2">
-//                   <button
-//                     className="btn btn-outline-secondary btn-sm"
-//                     disabled={page <= 1}
-//                     onClick={() => setPage((p) => p - 1)}
+//               {totalPages > 1 && (
+//                 <div className="d-flex justify-content-end gap-2">
+//                   <Button
+//                     size="sm"
+//                     disabled={page === 1}
+//                     onClick={() => setPage(page - 1)}
 //                   >
 //                     Prev
-//                   </button>
-
-//                   <button
-//                     className="btn btn-outline-secondary btn-sm"
-//                     disabled={page >= totalPages}
-//                     onClick={() => setPage((p) => p + 1)}
+//                   </Button>
+//                   <span className="pt-1">
+//                     Page {page} / {totalPages}
+//                   </span>
+//                   <Button
+//                     size="sm"
+//                     disabled={page === totalPages}
+//                     onClick={() => setPage(page + 1)}
 //                   >
 //                     Next
-//                   </button>
+//                   </Button>
 //                 </div>
-//               </div>
+//               )}
 //             </Card.Body>
 //           </Card>
 //         </Col>
@@ -443,224 +224,121 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Table, Form, Button } from "react-bootstrap";
+import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Seo from "@/shared/layouts-components/seo/seo";
 import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-import { toast } from "react-toastify";
-
-function getAuthHeader() {
-  const t = typeof window !== "undefined" ? localStorage.getItem("accessToken") : "";
-  return t ? { Authorization: `Bearer ${t}` } : {};
-}
+import { Card, Col, Row, Table } from "react-bootstrap";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function ChildrenListPage() {
   const router = useRouter();
+  const [children, setChildren] = useState<any[]>([]);
 
-  const [rows, setRows] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [total, setTotal] = useState(0);
-
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("created_at");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  const totalPages = Math.ceil(total / limit);
+  async function loadChildren() {
+    try {
+      const res = await fetch("/api/admin/children");
+      const data = await res.json();
+      if (data.status) {
+        setChildren(data.data);
+      }
+    } catch {
+      toast.error("Failed to load children");
+    }
+  }
 
   useEffect(() => {
-    fetchChildren();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, search, sortBy, sortDir]);
-
-  async function fetchChildren() {
-    setLoading(true);
-    try {
-      const qs = new URLSearchParams({
-        page: String(page),
-        limit: String(limit),
-        search,
-        sortBy,
-        sortDir,
-      });
-
-      const res = await fetch(`/api/admin/children?${qs.toString()}`, {
-        headers: { ...getAuthHeader() },
-      });
-
-      const json = await res.json();
-
-      if (!json?.status) {
-        toast.error("Failed to load children");
-        return;
-      }
-
-      // ✅ CORRECT MAPPING (your issue fixed here)
-      setRows(json.data.data || []);
-      setTotal(json.data.total || 0);
-    } catch (e) {
-      console.error(e);
-      toast.error("Server error");
-    } finally {
-      setLoading(false);
-    }
-  }
+    loadChildren();
+  }, []);
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this child?")) return;
+    if (!confirm("Delete this parent?")) return;
 
-    try {
-      const res = await fetch(`/api/admin/children/${id}`, {
-        method: "DELETE",
-        headers: { ...getAuthHeader() },
-      });
-      const json = await res.json();
+    const res = await fetch(`/api/admin/children/${id}`, { method: "DELETE" });
+    const data = await res.json();
 
-      if (!json?.status) {
-        toast.error(json.message || "Delete failed");
-        return;
-      }
-
-      toast.success("Child deleted");
-      fetchChildren();
-    } catch (e) {
-      toast.error("Server error");
-    }
-  }
-
-  function toggleSort(field: string) {
-    if (sortBy === field) {
-      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    if (data.status) {
+      toast.success("Deleted");
+      loadChildren();
     } else {
-      setSortBy(field);
-      setSortDir("asc");
+      toast.error(data.message);
     }
   }
 
   return (
-    <>
-      <Seo title="Children" />
-      <Pageheader title="Children" currentpage="Children" activepage="Children" />
+    <Fragment>
+      <Seo title="Childrens List" />
+      <Pageheader title="Childrens" currentpage="Childrens List" activepage="Childrens" />
 
       <Row>
         <Col xl={12}>
           <Card className="custom-card">
-            <Card.Header className="d-flex justify-content-between">
-              <div className="card-title">Children List</div>
-              <Button onClick={() => router.push("/admin/children/add")}>
-                + Add Child
-              </Button>
+            <Card.Header>
+              <Card.Title>Childrens List</Card.Title>
             </Card.Header>
-
             <Card.Body>
-              <Row className="mb-3">
-                <Col md={4}>
-                  <Form.Control
-                    placeholder="Search name / ID / phone"
-                    value={search}
-                    onChange={(e) => {
-                      setPage(1);
-                      setSearch(e.target.value);
-                    }}
-                  />
-                </Col>
-              </Row>
-
-              <Table bordered hover responsive>
-                <thead>
-                  <tr>
-                    <th onClick={() => toggleSort("child_id")}>Child ID</th>
-                    <th onClick={() => toggleSort("full_name")}>Name</th>
-                    <th>DOB</th>
-                    <th>Gender</th>
-                    <th>Parents</th>
-                    <th>Contact</th>
-                    <th width={140}>Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {loading && (
+              <div className="table-responsive">
+                <Table bordered hover size="sm">
+                  <thead>
                     <tr>
-                      <td colSpan={7} className="text-center">
-                        Loading...
-                      </td>
+                      <th>#</th>
+                      <th>Child UID</th>
+                      <th>Name</th>
+                      <th>Parent Name</th>
+                      <th>Gender</th>
+                      <th>Contact</th>
+                      <th>Actions</th>
                     </tr>
-                  )}
+                  </thead>
+                  <tbody>
+                    {children.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="text-center">No records</td>
+                      </tr>
+                    ) : (
+                      children.map((r, i) => (
+                        <tr key={r._id}>
+                          <td>{i + 1}</td>
+                          <td>{r.child_id}</td>
+                          <td>{r.full_name}</td>
+                          <td>
+                         {Array.isArray(r.parent_ids)
+                           ? r.parent_ids.map((p: any) => p.first_name).join(", ")
+                           : "-"}
+                       </td>
+                          <td>{r.gender_code}</td>
+                          <td>{r.primary_contact}</td>
+                          <td>
+                            <button
+                              className="btn btn-sm btn-primary me-2"
+                              onClick={() =>
+                                router.push(`/admin/children/add?id=${r._id}`)
+                              }
+                            >
+                              Edit
+                            </button>
 
-                  {!loading && rows.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="text-center">
-                        No records found
-                      </td>
-                    </tr>
-                  )}
-
-                  {rows.map((r) => (
-                    <tr key={r._id}>
-                      <td>{r.child_id}</td>
-                      <td>{r.full_name}</td>
-                      <td>{r.dob?.slice(0, 10)}</td>
-                      <td>{r.gender_code}</td>
-                      <td>
-                        {Array.isArray(r.parent_ids)
-                          ? r.parent_ids.map((p: any) => p.first_name).join(", ")
-                          : "-"}
-                      </td>
-                      <td>{r.primary_contact || "-"}</td>
-                      <td>
-                        <Button
-                          size="sm"
-                          variant="warning"
-                          className="me-2"
-                          onClick={() =>
-                            router.push(`/admin/children/add?id=${r._id}`)
-                          }
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          onClick={() => handleDelete(r._id)}
-                        >
-                          Delete
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="d-flex justify-content-end gap-2">
-                  <Button
-                    size="sm"
-                    disabled={page === 1}
-                    onClick={() => setPage(page - 1)}
-                  >
-                    Prev
-                  </Button>
-                  <span className="pt-1">
-                    Page {page} / {totalPages}
-                  </span>
-                  <Button
-                    size="sm"
-                    disabled={page === totalPages}
-                    onClick={() => setPage(page + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
+                            <button
+                              className="btn btn-sm btn-danger"
+                              onClick={() => handleDelete(r._id)}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </Table>
+              </div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
-    </>
+
+      <ToastContainer position="top-right" autoClose={2000} />
+    </Fragment>
   );
 }
+
+

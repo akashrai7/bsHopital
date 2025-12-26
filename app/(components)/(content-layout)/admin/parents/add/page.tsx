@@ -241,13 +241,13 @@ export default function AdminAddEditParentPage() {
     if (!form.last_name || !nameRegex.test(form.last_name)) e.last_name = "Last name required (1-80 letters/hyphen).";
 
     // email conditional recommended
-    if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) e.email = "Invalid email format.";
+    if (!form.email && !/^\S+@\S+\.\S+$/.test(form.email)) e.email = "Invalid email format.";
 
     // phone basic check E.164-ish
     if (!form.phone || !/^\+?[0-9]{7,15}$/.test(form.phone)) e.phone = "Phone required in digits (E.164-ish).";
 
     // aadhaar
-    if (form.aadhaar && !/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Aadhaar must be 12 digits.";
+    if (!form.aadhaar && !/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Aadhaar must be 12 digits.";
 
     // password only required when creating new (admin provides or set-password flow)
     if (!editId) {
@@ -427,38 +427,11 @@ export default function AdminAddEditParentPage() {
             <Card.Body>
               <form onSubmit={handleSubmit}>
                 <Row className="gy-3">
-                  {/* names */}
-                  <Col xl={4}>
-                    <Form.Label>First Name *</Form.Label>
-                    <Form.Control
-                      value={form.first_name}
-                      onChange={(e) => setForm({ ...form, first_name: e.target.value })}
-                      isInvalid={!!errors.first_name}
-                    />
-                    <Form.Control.Feedback type="invalid">{errors.first_name}</Form.Control.Feedback>
-                  </Col>
 
-                  <Col xl={4}>
-                    <Form.Label>Middle Name</Form.Label>
-                    <Form.Control
-                      value={form.middle_name}
-                      onChange={(e) => setForm({ ...form, middle_name: e.target.value })}
-                    />
-                  </Col>
-
-                  <Col xl={4}>
-                    <Form.Label>Last Name *</Form.Label>
-                    <Form.Control
-                      value={form.last_name}
-                      onChange={(e) => setForm({ ...form, last_name: e.target.value })}
-                      isInvalid={!!errors.last_name}
-                    />
-                    <Form.Control.Feedback type="invalid">{errors.last_name}</Form.Control.Feedback>
-                  </Col>
 
                   {/* email / phone / aadhaar */}
                   <Col xl={4}>
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label>Email *</Form.Label>
                     <Form.Control
                       type="email"
                       value={form.email}
@@ -487,7 +460,7 @@ export default function AdminAddEditParentPage() {
                   </Col>
 
                   <Col xl={4}>
-                    <Form.Label>Aadhaar</Form.Label>
+                    <Form.Label>Aadhaar *</Form.Label>
                     <Form.Control
                       value={form.aadhaar}
                       onChange={(e) => { setForm({ ...form, aadhaar: e.target.value }); setAadhaarStatus("idle"); }}
@@ -499,6 +472,35 @@ export default function AdminAddEditParentPage() {
                     {aadhaarStatus === "exists" && <small className="text-danger">Aadhaar already registered</small>}
                     {aadhaarStatus === "ok" && <small className="text-success">Aadhaar available</small>}
                     <Form.Control.Feedback type="invalid">{errors.aadhaar}</Form.Control.Feedback>
+                  </Col>
+
+                  {/* names */}
+                  <Col xl={4}>
+                    <Form.Label>First Name *</Form.Label>
+                    <Form.Control
+                      value={form.first_name}
+                      onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                      isInvalid={!!errors.first_name}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.first_name}</Form.Control.Feedback>
+                  </Col>
+
+                  <Col xl={4}>
+                    <Form.Label>Middle Name</Form.Label>
+                    <Form.Control
+                      value={form.middle_name}
+                      onChange={(e) => setForm({ ...form, middle_name: e.target.value })}
+                    />
+                  </Col>
+
+                  <Col xl={4}>
+                    <Form.Label>Last Name *</Form.Label>
+                    <Form.Control
+                      value={form.last_name}
+                      onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                      isInvalid={!!errors.last_name}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.last_name}</Form.Control.Feedback>
                   </Col>
 
                   {/* password (admin only on create) */}
