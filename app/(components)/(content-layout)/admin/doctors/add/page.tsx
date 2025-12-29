@@ -502,7 +502,7 @@ function onLicenseChange(e: React.ChangeEvent<HTMLInputElement>) {
   return (
     <Fragment>
       <Seo title={editId ? "Edit Doctor" : "Add Doctor"} />
-      <Pageheader title="Doctors" currentpage={editId ? "Edit Doctor" : "Add Doctor"} activepage="Doctors" />
+      <Pageheader title="Doctors" currentpage={editId ? "Edit Doctor" : "Add Doctor"} activepage="add" />
 
       <Row>
         <Col xl={12}>

@@ -66,7 +66,7 @@ export const MENUITEMS: any = [
       {
         title: "Parents", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          { path: "/admin/parents/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
+          // { path: "/admin/parents/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
           { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
           // { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
          
@@ -75,10 +75,13 @@ export const MENUITEMS: any = [
 
         ]
       },
+        {
+        path: "/admin/parents/", type: "link",icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Parents" 
+      },
       {
         title: "Childs", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
+          // { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
           { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Childs List" },
         ]
       },
@@ -91,7 +94,20 @@ export const MENUITEMS: any = [
       },
     ],
   },
+// {
+//     title: "Users", icon: Svgicons.Profileicon, type: "sub", active: false, dirchange: false, children: [
 
+//  { 
+//   path: "/admin/parents/", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Parents"
+//  },
+//  { 
+//   path: "/admin/children/", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Childs"
+//  },
+//  { 
+//   path: "/admin/doctors/", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Doctors"
+//  }
+//     ]
+//   },
 
 /*
   {

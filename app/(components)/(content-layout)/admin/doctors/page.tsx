@@ -44,7 +44,7 @@ export default function DoctorsListPage() {
   return (
     <Fragment>
       <Seo title="Doctors List" />
-      <Pageheader title="Doctors" currentpage="Doctors List" activepage="Doctors" />
+      <Pageheader title="Doctors" currentpage="Doctors List" activepage="doctors" />
 
       <Row>
         <Col xl={12}>

@@ -770,7 +770,7 @@ const Sidebar = () => {
 								</Fragment>
 							))}
 							<li>
-								<ul className="slide-menu child1 doublemenu_slide-menu">
+								{/* <ul className="slide-menu child1 doublemenu_slide-menu">
 									<li className="text-center p-3 text-fixed-white">
 										<div className="doublemenu_slide-menu-background">
 											<Image fill src={`${process.env.NODE_ENV === 'production' ? basePath : ''}/assets/images/media/backgrounds/13.png`} alt="" className="" />
@@ -791,7 +791,7 @@ const Sidebar = () => {
 											</div>
 										</div>
 									</li>
-								</ul>
+								</ul> */}
 							</li>
 
 							{/* <!-- End::slide --> */}

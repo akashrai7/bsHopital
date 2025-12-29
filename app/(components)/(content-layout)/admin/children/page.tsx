@@ -1,226 +1,125 @@
 // "use client";
 
-// import React, { useEffect, useState } from "react";
-// import { Card, Row, Col, Table, Form, Button } from "react-bootstrap";
+// import React, { Fragment, useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
 // import Seo from "@/shared/layouts-components/seo/seo";
 // import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-// import { toast } from "react-toastify";
+// import { Card, Col, Row, Table } from "react-bootstrap";
+// import { toast, ToastContainer } from "react-toastify";
 
-// function getAuthHeader() {
-//   const t = typeof window !== "undefined" ? localStorage.getItem("accessToken") : "";
-//   return t ? { Authorization: `Bearer ${t}` } : {};
-// }
-
-// export default function ChildrenListPage() {
+//  function ChildrenListPage() {
 //   const router = useRouter();
+//   const [children, setChildren] = useState<any[]>([]);
 
-//   const [rows, setRows] = useState<any[]>([]);
-//   const [loading, setLoading] = useState(false);
-
-//   const [page, setPage] = useState(1);
-//   const [limit] = useState(10);
-//   const [total, setTotal] = useState(0);
-
-//   const [search, setSearch] = useState("");
-//   const [sortBy, setSortBy] = useState("created_at");
-//   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-//   const totalPages = Math.ceil(total / limit);
+//   async function loadChildren() {
+//     try {
+//       const res = await fetch("/api/admin/children");
+//       const data = await res.json();
+//       if (data.status) {
+//         setChildren(data.data);
+//       }
+//     } catch {
+//       toast.error("Failed to load children");
+//     }
+//   }
 
 //   useEffect(() => {
-//     fetchChildren();
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [page, search, sortBy, sortDir]);
-
-//   async function fetchChildren() {
-//     setLoading(true);
-//     try {
-//       const qs = new URLSearchParams({
-//         page: String(page),
-//         limit: String(limit),
-//         search,
-//         sortBy,
-//         sortDir,
-//       });
-
-//       const res = await fetch(`/api/admin/children?${qs.toString()}`, {
-//         headers: { ...getAuthHeader() },
-//       });
-
-//       const json = await res.json();
-
-//       if (!json?.status) {
-//         toast.error("Failed to load children");
-//         return;
-//       }
-
-//       // ✅ CORRECT MAPPING (your issue fixed here)
-//       setRows(json.data.data || []);
-//       setTotal(json.data.total || 0);
-//     } catch (e) {
-//       console.error(e);
-//       toast.error("Server error");
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
+//     loadChildren();
+//   }, []);
 
 //   async function handleDelete(id: string) {
-//     if (!confirm("Delete this child?")) return;
+//     if (!confirm("Delete this parent?")) return;
 
-//     try {
-//       const res = await fetch(`/api/admin/children/${id}`, {
-//         method: "DELETE",
-//         headers: { ...getAuthHeader() },
-//       });
-//       const json = await res.json();
+//     const res = await fetch(`/api/admin/children/${id}`, { method: "DELETE" });
+//     const data = await res.json();
 
-//       if (!json?.status) {
-//         toast.error(json.message || "Delete failed");
-//         return;
-//       }
-
-//       toast.success("Child deleted");
-//       fetchChildren();
-//     } catch (e) {
-//       toast.error("Server error");
-//     }
-//   }
-
-//   function toggleSort(field: string) {
-//     if (sortBy === field) {
-//       setSortDir(sortDir === "asc" ? "desc" : "asc");
+//     if (data.status) {
+//       toast.success("Deleted");
+//       loadChildren();
 //     } else {
-//       setSortBy(field);
-//       setSortDir("asc");
+//       toast.error(data.message);
 //     }
 //   }
+
 
 //   return (
-//     <>
-//       <Seo title="Children" />
-//       <Pageheader title="Children" currentpage="Children" activepage="Children" />
+//     <Fragment>
+//       <Seo title="Childrens List" />
+//       <Pageheader title="Children" currentpage="Childrens List" activepage="Children" />
 
 //       <Row>
 //         <Col xl={12}>
 //           <Card className="custom-card">
-//             <Card.Header className="d-flex justify-content-between">
-//               <div className="card-title">Children List</div>
-//               <Button onClick={() => router.push("/admin/children/add")}>
-//                 + Add Child
-//               </Button>
+//             <Card.Header>
+//               <Card.Title>Childrens List</Card.Title>
 //             </Card.Header>
-
 //             <Card.Body>
-//               <Row className="mb-3">
-//                 <Col md={4}>
-//                   <Form.Control
-//                     placeholder="Search name / ID / phone"
-//                     value={search}
-//                     onChange={(e) => {
-//                       setPage(1);
-//                       setSearch(e.target.value);
-//                     }}
-//                   />
-//                 </Col>
-//               </Row>
-
-//               <Table bordered hover responsive>
-//                 <thead>
-//                   <tr>
-//                     <th onClick={() => toggleSort("child_id")}>Child ID</th>
-//                     <th onClick={() => toggleSort("full_name")}>Name</th>
-//                     <th>DOB</th>
-//                     <th>Gender</th>
-//                     <th>children</th>
-//                     <th>Contact</th>
-//                     <th width={140}>Actions</th>
-//                   </tr>
-//                 </thead>
-
-//                 <tbody>
-//                   {loading && (
+//               <div className="table-responsive">
+//                 <Table bordered hover size="sm">
+//                   <thead>
 //                     <tr>
-//                       <td colSpan={7} className="text-center">
-//                         Loading...
-//                       </td>
+//                       <th>#</th>
+//                       <th>Child UID</th>
+//                       <th>Name</th>
+//                       <th>Parent Name</th>
+//                       <th>Gender</th>
+//                       <th>Contact</th>
+//                       <th>Actions</th>
 //                     </tr>
-//                   )}
+//                   </thead>
+//                   <tbody>
+//                     {children.length === 0 ? (
+//                       <tr>
+//                         <td colSpan={6} className="text-center">No records</td>
+//                       </tr>
+//                     ) : (
+//                       children.map((r, i) => (
+//                         <tr key={r._id}>
+//                           <td>{i + 1}</td>
+//                           <td>{r.child_id}</td>
+//                           <td>{r.full_name}</td>
+//                           <td>
+//                          {Array.isArray(r.parent_ids)
+//                            ? r.parent_ids.map((p: any) => p.first_name).join(", ")
+//                            : "-"}
+//                        </td>
+//                           <td>{r.gender_code}</td>
+//                           <td>{r.primary_contact}</td>
+//                           <td>
+//                             <button
+//                               className="btn btn-sm btn-primary me-2"
+//                               onClick={() =>
+//                                 router.push(`/admin/children/add?id=${r._id}`)
+//                               }
+//                             >
+//                               Edit
+//                             </button>
 
-//                   {!loading && rows.length === 0 && (
-//                     <tr>
-//                       <td colSpan={7} className="text-center">
-//                         No records found
-//                       </td>
-//                     </tr>
-//                   )}
-
-//                   {rows.map((r) => (
-//                     <tr key={r._id}>
-//                       <td>{r.child_id}</td>
-//                       <td>{r.full_name}</td>
-//                       <td>{r.dob?.slice(0, 10)}</td>
-//                       <td>{r.gender_code}</td>
-//                       <td>
-//                         {Array.isArray(r.parent_ids)
-//                           ? r.parent_ids.map((p: any) => p.first_name).join(", ")
-//                           : "-"}
-//                       </td>
-//                       <td>{r.primary_contact || "-"}</td>
-//                       <td>
-//                         <Button
-//                           size="sm"
-//                           variant="warning"
-//                           className="me-2"
-//                           onClick={() =>
-//                             router.push(`/admin/children/add?id=${r._id}`)
-//                           }
-//                         >
-//                           Edit
-//                         </Button>
-//                         <Button
-//                           size="sm"
-//                           variant="danger"
-//                           onClick={() => handleDelete(r._id)}
-//                         >
-//                           Delete
-//                         </Button>
-//                       </td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </Table>
-
-//               {/* Pagination */}
-//               {totalPages > 1 && (
-//                 <div className="d-flex justify-content-end gap-2">
-//                   <Button
-//                     size="sm"
-//                     disabled={page === 1}
-//                     onClick={() => setPage(page - 1)}
-//                   >
-//                     Prev
-//                   </Button>
-//                   <span className="pt-1">
-//                     Page {page} / {totalPages}
-//                   </span>
-//                   <Button
-//                     size="sm"
-//                     disabled={page === totalPages}
-//                     onClick={() => setPage(page + 1)}
-//                   >
-//                     Next
-//                   </Button>
-//                 </div>
-//               )}
+//                             <button
+//                               className="btn btn-sm btn-danger"
+//                               onClick={() => handleDelete(r._id)}
+//                             >
+//                               Delete
+//                             </button>
+//                           </td>
+//                         </tr>
+//                       ))
+//                     )}
+//                   </tbody>
+//                 </Table>
+//               </div>
 //             </Card.Body>
 //           </Card>
 //         </Col>
 //       </Row>
-//     </>
+
+//       <ToastContainer position="top-right" autoClose={2000} />
+//     </Fragment>
 //   );
 // }
+
+
+// export default ChildrenListPage;
 
 "use client";
 
@@ -228,108 +127,283 @@ import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Seo from "@/shared/layouts-components/seo/seo";
 import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-import { Card, Col, Row, Table } from "react-bootstrap";
+import { Card, Col, Row, Table, Form, Button } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
+
+/* ================= TYPES ================= */
+
+interface Parent {
+  _id: string;
+  first_name: string;
+}
+
+interface Child {
+  _id: string;
+  child_id: string;
+  full_name: string;
+  gender_code: "M" | "F" | "O";
+  primary_contact?: string;
+  dob: string;
+  hospital_name: string;
+  parent_ids: Parent[];
+}
+
+type UserRole = "super_admin" | "admin" | "viewer";
+
+/* ================= AUTH ================= */
+
+// function getAuthHeader() {
+//   if (typeof window === "undefined") return {};
+//   const token = localStorage.getItem("accessToken");
+//   return token ? { Authorization: `Bearer ${token}` } : {};
+// }
+
+ function getAuthHeader(): Record<string, string> {
+    try {
+      if (typeof window === "undefined") return {};
+      const token = localStorage.getItem("accessToken") || "";
+      const headers: HeadersInit = { "Content-Type": "application/json" };
+    
+      return token ? { Authorization: `Bearer ${token}` } : { };
+    } catch {
+      return {};
+    }
+  }
+
+/* ================= COMPONENT ================= */
 
 export default function ChildrenListPage() {
   const router = useRouter();
-  const [children, setChildren] = useState<any[]>([]);
 
-  async function loadChildren() {
+  /* ---- STATE ---- */
+  const [children, setChildren] = useState<Child[]>([]);
+  const [search, setSearch] = useState("");
+  const [gender, setGender] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  // 🔐 replace later with real auth/session
+  const userRole: UserRole = "admin";
+
+  /* ---- FETCH ---- */
+  async function loadChildren(resetPage = false) {
     try {
-      const res = await fetch("/api/admin/children");
-      const data = await res.json();
-      if (data.status) {
-        setChildren(data.data);
-      }
-    } catch {
-      toast.error("Failed to load children");
+      setLoading(true);
+
+      const query = new URLSearchParams({
+        search,
+        gender,
+        page: String(resetPage ? 1 : page),
+        limit: "10",
+      });
+
+      const res = await fetch(`/api/admin/children?${query}`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
+
+      const json = await res.json();
+      if (!json?.status) throw new Error(json.message);
+
+      setChildren(json.data.data);
+      setTotalPages(json.data.totalPages);
+    } catch (e: any) {
+      toast.error(e.message || "Failed to load children");
+    } finally {
+      setLoading(false);
     }
   }
 
+  /* ---- EFFECTS ---- */
+
+  // page / gender change
   useEffect(() => {
     loadChildren();
-  }, []);
+  }, [page, gender]);
 
+  // debounced search
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setPage(1);
+      loadChildren(true);
+    }, 500);
+
+    return () => clearTimeout(t);
+  }, [search]);
+
+  /* ---- DELETE ---- */
   async function handleDelete(id: string) {
-    if (!confirm("Delete this parent?")) return;
+    if (!confirm("Delete this child?")) return;
 
-    const res = await fetch(`/api/admin/children/${id}`, { method: "DELETE" });
-    const data = await res.json();
+    try {
+      const res = await fetch(`/api/admin/children/${id}`, {
+        method: "DELETE",
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
-    if (data.status) {
-      toast.success("Deleted");
+      const json = await res.json();
+      if (!json?.status) throw new Error(json.message);
+
+      toast.success("Child deleted");
       loadChildren();
-    } else {
-      toast.error(data.message);
+    } catch (e: any) {
+      toast.error(e.message || "Delete failed");
     }
   }
+
+  /* ================= UI ================= */
 
   return (
     <Fragment>
-      <Seo title="Childrens List" />
-      <Pageheader title="Childrens" currentpage="Childrens List" activepage="Childrens" />
+      <Seo title="Children List" />
+      <Pageheader
+        title="Childs List"
+        currentpage="Children"
+        activepage="Children"
+      />
 
       <Row>
         <Col xl={12}>
           <Card className="custom-card">
-            <Card.Header>
-              <Card.Title>Childrens List</Card.Title>
+            <Card.Header className="d-flex justify-content-between align-items-center">
+              <Card.Title>Children List</Card.Title>
+
+              {(userRole === "admin" || userRole === "super_admin") && (
+                <Button
+                  size="sm"
+                  onClick={() => router.push("/admin/children/add")}
+                >
+                  + Add Child
+                </Button>
+              )}
             </Card.Header>
+
             <Card.Body>
+              {/* 🔍 FILTER BAR */}
+              <Row className="mb-3 g-2">
+                <Col md={4}>
+                  <Form.Control
+                    placeholder="Search by name / child id"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </Col>
+
+                {/* <Col md={3}>
+                  <Form.Select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    <option value="">All Genders</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="O">Other</option>
+                  </Form.Select>
+                </Col> */}
+              </Row>
+
+              {/* 📋 TABLE */}
               <div className="table-responsive">
-                <Table bordered hover size="sm">
+                <Table bordered hover size="sm" className="align-middle">
                   <thead>
                     <tr>
                       <th>#</th>
                       <th>Child UID</th>
                       <th>Name</th>
-                      <th>Parent Name</th>
+                      <th>Parent name</th>
                       <th>Gender</th>
                       <th>Contact</th>
-                      <th>Actions</th>
+                      <th>DOB</th>
+                      <th>Hospital name</th>
+                      <th className="text-center">Actions</th>
                     </tr>
                   </thead>
+
                   <tbody>
-                    {children.length === 0 ? (
+                    {loading ? (
                       <tr>
-                        <td colSpan={6} className="text-center">No records</td>
+                        <td colSpan={7} className="text-center">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : children.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="text-center text-muted">
+                          No records found
+                        </td>
                       </tr>
                     ) : (
-                      children.map((r, i) => (
-                        <tr key={r._id}>
-                          <td>{i + 1}</td>
-                          <td>{r.child_id}</td>
-                          <td>{r.full_name}</td>
+                      children.map((c, i) => (
+                        <tr key={c._id}>
+                          <td>{(page - 1) * 10 + i + 1}</td>
+                          <td>{c.child_id}</td>
+                          <td>{c.full_name}</td>
                           <td>
-                         {Array.isArray(r.parent_ids)
-                           ? r.parent_ids.map((p: any) => p.first_name).join(", ")
-                           : "-"}
-                       </td>
-                          <td>{r.gender_code}</td>
-                          <td>{r.primary_contact}</td>
-                          <td>
-                            <button
-                              className="btn btn-sm btn-primary me-2"
+                            {c.parent_ids
+                              ?.map((p) => p.first_name)
+                              .join(", ") || "-"}
+                          </td>
+                          <td>{c.gender_code}</td>
+                          <td>{c.primary_contact || "-"}</td>
+                          <td>{c.dob}</td>
+                          <td>{c.hospital_name}</td>
+                          <td className="text-center">
+                            <Button
+                              size="sm"
+                              variant="outline-primary"
+                              className="me-1"
                               onClick={() =>
-                                router.push(`/admin/children/add?id=${r._id}`)
+                                router.push(
+                                  `/admin/children/add?id=${c._id}`
+                                )
                               }
                             >
                               Edit
-                            </button>
+                            </Button>
 
-                            <button
-                              className="btn btn-sm btn-danger"
-                              onClick={() => handleDelete(r._id)}
-                            >
-                              Delete
-                            </button>
+                            {(userRole === "admin" ||
+                              userRole === "super_admin") && (
+                              <Button
+                                size="sm"
+                                variant="outline-danger"
+                                onClick={() => handleDelete(c._id)}
+                              >
+                                Delete
+                              </Button>
+                            )}
                           </td>
                         </tr>
                       ))
                     )}
                   </tbody>
                 </Table>
+              </div>
+
+              {/* 📄 PAGINATION */}
+              <div className="d-flex justify-content-end gap-2 mt-3">
+                <Button
+                  size="sm"
+                  disabled={page === 1 || loading}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  Prev
+                </Button>
+
+                <span className="px-2 small">
+                  Page {page} of {totalPages}
+                </span>
+
+                <Button
+                  size="sm"
+                  disabled={page === totalPages || loading}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                </Button>
               </div>
             </Card.Body>
           </Card>
@@ -340,5 +414,3 @@ export default function ChildrenListPage() {
     </Fragment>
   );
 }
-
-
