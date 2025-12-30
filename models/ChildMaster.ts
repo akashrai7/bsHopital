@@ -1,29 +1,4 @@
-// import mongoose, { Schema } from "mongoose";
-
-// const ChildSchema = new Schema(
-//   {
-//     child_id: { type: String, unique: true },
-//     full_name: { type: String, required: true },
-//     dob: { type: Date, required: true },
-//     gender_code: { type: String, required: true },
-//     blood_group_code: String,
-//     birth_weight_kg: Number,
-//     birth_length_cm: Number,
-//     place_of_birth: String,
-//     hospital_name: String,
-//     birth_registration_id: String,
-//     parent_ids: [{ type: Schema.Types.ObjectId, ref: "ParentMaster", required: true }],
-//     photo: String,
-//     primary_contact: String,
-//     preferred_clinic_id: String,
-//     notes: String,
-//     consent_data_sharing: { type: Boolean, default: false },
-//   },
-//   { timestamps: true, collection: "child_master" }
-// );
-
-// export default mongoose.models.ChildMaster ||
-//    mongoose.model("ChildMaster", ChildSchema);
+// models/ChildMaster.ts
 
 import mongoose, { Schema, Types, model, models } from "mongoose";
 

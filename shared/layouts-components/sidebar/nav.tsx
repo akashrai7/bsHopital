@@ -58,56 +58,56 @@ export const MENUITEMS: any = [
   },
 
   {
-    menutitle:'WEB APPS'
+    menutitle:'Users'
  },
- {
-    title: "Users", icon: Svgicons.Profileicon, type: "sub", active: false, selected: false, dirchange: false, children: [
+//  {
+//     title: "Users", icon: Svgicons.Profileicon, type: "sub", active: false, selected: false, dirchange: false, children: [
 
-      {
-        title: "Parents", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
+//       {
+//         title: "Parents", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          // { path: "/admin/parents/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
-          { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
-          // { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
+//           // { path: "/admin/parents/add", type: "link", active: false, selected: false, dirchange: false, title: "New Parent" },
+//           { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "Parent List" },
+//           // { path: "/admin/parents/", type: "link", active: false, selected: false, dirchange: false, title: "View Parent" },
          
 
-          // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
+//           // { path: "/applications/email/mail-settings", type: "link", active: false, selected: false, dirchange: false, title: "Mail-Settings" },
 
-        ]
-      },
-        {
-        path: "/admin/parents/", type: "link",icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Parents" 
-      },
-      {
-        title: "Childs", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
+//         ]
+//       },
+//         {
+//         path: "/admin/parents", type: "link",icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Parents" 
+//       },
+//       {
+//         title: "Childs", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          // { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
-          { path: "/admin/children/", type: "link", active: false, selected: false, dirchange: false, title: "Childs List" },
-        ]
-      },
-       {
-        title: "Doctors", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
+//           // { path: "/admin/children/add", type: "link", active: false, selected: false, dirchange: false, title: "New Child" },
+//           { path: "/admin/children", type: "link", active: false, selected: false, dirchange: false, title: "Childs List" },
+//         ]
+//       },
+//        {
+//         title: "Doctors", type: "sub", icon: Svgicons.Profileicon, active: false, children: [
 
-          { path: "/admin/doctors/add", type: "link", active: false, selected: false, dirchange: false, title: "New Doctor" },
-          { path: "/admin/doctors/", type: "link", active: false, selected: false, dirchange: false, title: "Doctors List" },
-        ]
-      },
-    ],
-  },
-// {
-//     title: "Users", icon: Svgicons.Profileicon, type: "sub", active: false, dirchange: false, children: [
-
-//  { 
-//   path: "/admin/parents/", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Parents"
-//  },
-//  { 
-//   path: "/admin/children/", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Childs"
-//  },
-//  { 
-//   path: "/admin/doctors/", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Doctors"
-//  }
-//     ]
+//           { path: "/admin/doctors/add", type: "link", active: false, selected: false, dirchange: false, title: "New Doctor" },
+//           { path: "/admin/doctors", type: "link", active: false, selected: false, dirchange: false, title: "Doctors List" },
+//         ]
+//       },
+//     ],
 //   },
+{
+    title: "Users", icon: Svgicons.Profileicon, type: "sub", active: false, dirchange: false, children: [
+
+ { 
+  path: "/admin/parents", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Parents"
+ },
+ { 
+  path: "/admin/children", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Childs"
+ },
+ { 
+  path: "/admin/doctors", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Doctors"
+ }
+    ]
+  },
 
 /*
   {

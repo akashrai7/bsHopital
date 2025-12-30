@@ -349,7 +349,13 @@ export default function ChildrenListPage() {
                           </td>
                           <td>{c.gender_code}</td>
                           <td>{c.primary_contact || "-"}</td>
-                          <td>{c.dob}</td>
+                          {/* <td>{c.dob ? new Date(c.dob).toLocaleDateString("en-IN") : "-"} </td> */}
+                        <td> {c.dob ? new Date(c.dob).toLocaleDateString("en-IN", { 
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          }) : "-"}
+                        </td>
                           <td>{c.hospital_name}</td>
                           <td className="text-center">
                             <Button
