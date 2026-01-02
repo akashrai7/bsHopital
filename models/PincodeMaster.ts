@@ -108,4 +108,5 @@ const PincodeMaster: Model<IPincodeMaster> =
   mongoose.models.PincodeMaster ||
   mongoose.model<IPincodeMaster>("PincodeMaster", PincodeMasterSchema);
 
-export default PincodeMaster;
+export default mongoose.models.PincodeMaster ||
+  mongoose.model("PincodeMaster", PincodeMasterSchema);

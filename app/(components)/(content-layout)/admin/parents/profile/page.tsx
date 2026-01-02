@@ -27,6 +27,7 @@ export default function ParentDetailPage() {
   const [parent, setParent] = useState<any>(null);
   const [children, setChildren] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   /* ================= load ================= */
 
   useEffect(() => {
@@ -36,7 +37,8 @@ export default function ParentDetailPage() {
       try {
         const [pRes, cRes] = await Promise.all([
           fetch(`/api/admin/parents/${id}`, { headers: getAuthHeader() }),
-          fetch(`/api/admin/children?parentId=${id}`, {
+          // ✅ CORRECT API
+          fetch(`/api/admin/parents/${id}/children`, {
             headers: getAuthHeader(),
           }),
         ]);
@@ -45,12 +47,19 @@ export default function ParentDetailPage() {
         const cJson = await cRes.json();
 
         if (!pJson?.status) throw new Error("Parent load failed");
-        if (!cJson?.status) throw new Error("Children load failed");
 
         setParent(pJson.data);
-        setChildren(cJson.data || []);
-      } catch {
+
+        // ✅ ABSOLUTE SAFETY
+        if (Array.isArray(cJson?.data)) {
+          setChildren(cJson.data);
+        } else {
+          setChildren([]);
+        }
+      } catch (err) {
+        console.error(err);
         toast.error("Failed to load parent details");
+        setChildren([]);
       } finally {
         setLoading(false);
       }
@@ -75,11 +84,7 @@ export default function ParentDetailPage() {
             {/* ================= HEADER ================= */}
             <Card className="custom-card profile-card">
               <div className="profile-banner-image profile-img">
-                <Image
-                  fill
-                  src="/assets/images/media/media-3.jpg"
-                  alt="banner"
-                />
+                <Image fill src="/assets/images/media/media-3.jpg" alt="banner" />
               </div>
 
               <Card.Body className="p-4 pb-0 position-relative">
@@ -132,13 +137,8 @@ export default function ParentDetailPage() {
                       <Card.Body className="text-muted">
                         <p><b>Phone:</b> {parent.phone}</p>
                         <p><b>Email:</b> {parent.email || "-"}</p>
-                        <p>
-                          <b>City:</b> {parent.address?.city || "-"}
-                        </p>
-                        <p>
-                          <b>State:</b>{" "}
-                          {parent.address?.state?.name || "-"}
-                        </p>
+                        <p><b>City:</b> {parent.address?.city || "-"}</p>
+                        <p><b>State:</b> {parent.address?.state?.name || "-"}</p>
                       </Card.Body>
                     </Card>
                   </Col>

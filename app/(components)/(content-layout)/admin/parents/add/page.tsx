@@ -1,417 +1,3 @@
-// "use client";
-
-// import React, { Fragment, useEffect, useState } from "react";
-// import { useSearchParams, useRouter } from "next/navigation";
-// import Seo from "@/shared/layouts-components/seo/seo";
-// import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-// import { Card, Col, Form, Row, InputGroup } from "react-bootstrap";
-// import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
-// import SpkSelect from "@/shared/@spk-reusable-components/reusable-plugins/spk-reactselect";
-// import { toast, ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-
-// type Option = { value: string; label: string; [k: string]: any };
-
-// export default function AdminAddEditParentPage() {
-//   const router = useRouter();
-//   const searchParams = useSearchParams();
-//   const editId = searchParams?.get("id") || null;
-
-//   const [loading, setLoading] = useState(false);
-//   const [saving, setSaving] = useState(false);
-
-//   // dropdown data
-//   const [languages, setLanguages] = useState<Option[]>([]);
-//   const [relationships, setRelationships] = useState<Option[]>([]);
-//   const [countries, setCountries] = useState<any[]>([]);
-//   const [states, setStates] = useState<any[]>([]);
-//   const [districts, setDistricts] = useState<any[]>([]);
-
-//   // runtime uniqueness status
-//   const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "exists" | "ok">("idle");
-//   const [phoneStatus, setPhoneStatus] = useState<"idle" | "checking" | "exists" | "ok">("idle");
-//   const [aadhaarStatus, setAadhaarStatus] = useState<"idle" | "checking" | "exists" | "ok">("idle");
-
-//   // form state
-//   const [form, setForm] = useState<any>({
-//     first_name: "",
-//     middle_name: "",
-//     last_name: "",
-//     email: "",
-//     phone: "",
-//     aadhaar: "",
-//     password: "", // admin provides password when creating
-//     preferred_language: "",
-//     relationship_to_child: "",
-//     address: { line1: "", line2: "", city: "", pincode: "", country: "", state: "", district: "" },
-//     national_id: "",
-//     profile_photo: "", // url
-//     profile_photo_file: null as File | null,
-//     consent_whatsapp: false,
-//     terms_accepted: false,
-//     admin_notes: "",
-//     is_active: true,
-//   });
-
-//   const [errors, setErrors] = useState<Record<string, string>>({});
-
-//   // helper to include admin token if available - TS-safe
-//   function getAuthHeader(): Record<string, string> {
-//     try {
-//       if (typeof window === "undefined") return {};
-//       const t = localStorage.getItem("accessToken") || "";
-//       const headers: HeadersInit = { "Content-Type": "application/json" };
-    
-//       return t ? { Authorization: `Bearer ${t}` } : { };
-//     } catch {
-//       return {};
-//     }
-//   }
-
-//   // fetch dropdown masters
-//   async function fetchMasters() {
-//     try {
-//       // languages
-//       const langRes = await fetch("/api/settings/languages");
-//       const langJson = await langRes.json();
-//       if (langJson?.status) {
-//         setLanguages((langJson.data || []).map((l: any) => ({ value: l._id, label: `${l.name} (${l.code})` })));
-//       }
-
-//       // relationship master
-//       const relRes = await fetch("/api/settings/relationship-types");
-//       const relJson = await relRes.json();
-//       if (relJson?.status) {
-//         setRelationships((relJson.data || []).map((r: any) => ({ value: r._id, label: `${r.name} (${r.code || ""})` })));
-//       }
-
-//       // countries
-//       const cRes = await fetch("/api/settings/countries");
-//       const cJson = await cRes.json();
-//       if (cJson?.status) {
-//         setCountries(cJson.data || []);
-//       }
-//     } catch (err) {
-//       console.error("fetchMasters error", err);
-//       toast.error("Failed to load dropdown data");
-//     }
-//   }
-
-//   // fetch states (active only)
-//   async function fetchStatesForCountry(countryId?: string) {
-//     if (!countryId) {
-//       setStates([]);
-//       return;
-//     }
-//     try {
-//       const res = await fetch(`/api/settings/states?countryId=${countryId}&activeOnly=true`);
-//       const data = await res.json();
-//       if (data?.status) setStates(data.data || []);
-//       else setStates([]);
-//     } catch (err) {
-//       console.error("fetchStatesForCountry", err);
-//       setStates([]);
-//     }
-//   }
-
-//   // fetch districts for state
-//   async function fetchDistrictsForState(stateId?: string) {
-//     if (!stateId) {
-//       setDistricts([]);
-//       return;
-//     }
-//     try {
-//       const res = await fetch(`/api/settings/districts?stateId=${stateId}&activeOnly=true`);
-//       const data = await res.json();
-//       if (data?.status) setDistricts(data.data || []);
-//       else setDistricts([]);
-//     } catch (err) {
-//       console.error("fetchDistrictsForState", err);
-//       setDistricts([]);
-//     }
-//   }
-
-//   // load for edit
-//   async function loadForEdit(id: string) {
-//     setLoading(true);
-//     try {
-//       const headers: HeadersInit = {};
-//       const auth = getAuthHeader();
-//       if (auth.Authorization) (headers as Record<string, string>)["Authorization"] = auth.Authorization;
-
-//       const res = await fetch(`/api/admin/parents/${id}`, { headers });
-//       const data = await res.json();
-//       if (!data?.status) {
-//         toast.error(data?.message || "Failed to load parent");
-//         return;
-//       }
-//       const p = data.data;
-//       // normalize address if needed
-//       const address = p.address || {};
-//       setForm((prev: any) => ({
-//         ...prev,
-//         first_name: p.first_name || "",
-//         middle_name: p.middle_name || "",
-//         last_name: p.last_name || "",
-//         email: p.email || "",
-//         phone: p.phone || "",
-//         aadhaar: p.aadhaar || "",
-//         password: "", // keep empty for edit
-//         preferred_language: p.preferred_language?._id || p.preferred_language || "",
-//         relationship_to_child: p.relationship_to_child?._id || p.relationship_to_child || "",
-//         address: {
-//           line1: address.line1 || "",
-//           line2: address.line2 || "",
-//           city: address.city || "",
-//           pincode: address.pincode || "",
-//           country: address.country?._id || address.country || "",
-//           state: address.state?._id || address.state || "",
-//           district: address.district?._id || address.district || "",
-//         },
-//         national_id: p.national_id || "",
-//         profile_photo: p.profile_photo || "",
-//         consent_whatsapp: !!p.consent_whatsapp,
-//         terms_accepted: !!p.terms_accepted,
-//         admin_notes: p.admin_notes || "",
-//         is_active: typeof p.is_active === "boolean" ? p.is_active : true,
-//       }));
-
-//       // fetch the states and districts cascade if country/state present
-//       if (p.address?.country) {
-//         const countryId = typeof p.address.country === "object" ? p.address.country._id : p.address.country;
-//         await fetchStatesForCountry(countryId);
-//       }
-//       if (p.address?.state) {
-//         const stateId = typeof p.address.state === "object" ? p.address.state._id : p.address.state;
-//         await fetchDistrictsForState(stateId);
-//       }
-//     } catch (err) {
-//       console.error("loadForEdit", err);
-//       toast.error("Failed to load data");
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-
-//   useEffect(() => {
-//     fetchMasters();
-//     if (editId) loadForEdit(editId);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [editId]);
-
-//   // runtime uniqueness check
-//   async function checkUnique(type: "email" | "phone" | "aadhaar", value: string) {
-//     if (!value || value.trim() === "") return;
-//     if (type === "email") setEmailStatus("checking");
-//     if (type === "phone") setPhoneStatus("checking");
-//     if (type === "aadhaar") setAadhaarStatus("checking");
-//     try {
-//       const headers: HeadersInit = { "Content-Type": "application/json" };
-//       const auth = getAuthHeader();
-//       if (auth.Authorization) (headers as Record<string, string>)["Authorization"] = auth.Authorization;
-
-//       const res = await fetch("/api/parents/check-unique", {
-//         method: "POST",
-//         headers,
-//         body: JSON.stringify({ type, value }),
-//       });
-//       const data = await res.json();
-//       if (data?.data?.exists) {
-//         if (type === "email") setEmailStatus("exists");
-//         if (type === "phone") setPhoneStatus("exists");
-//         if (type === "aadhaar") setAadhaarStatus("exists");
-//       } else {
-//         if (type === "email") setEmailStatus("ok");
-//         if (type === "phone") setPhoneStatus("ok");
-//         if (type === "aadhaar") setAadhaarStatus("ok");
-//       }
-//     } catch (err) {
-//       console.error("checkUnique error", err);
-//       if (type === "email") setEmailStatus("idle");
-//       if (type === "phone") setPhoneStatus("idle");
-//       if (type === "aadhaar") setAadhaarStatus("idle");
-//     }
-//   }
-
-//   // validation
-//   function validateForm(): boolean {
-//     const e: Record<string, string> = {};
-//     const nameRegex = /^[A-Za-z\- ]{1,80}$/;
-//     if (!form.first_name || !nameRegex.test(form.first_name)) e.first_name = "First name required (1-80 letters/hyphen).";
-//     if (!form.last_name || !nameRegex.test(form.last_name)) e.last_name = "Last name required (1-80 letters/hyphen).";
-
-//     // email conditional recommended
-//     if (!form.email && !/^\S+@\S+\.\S+$/.test(form.email)) e.email = "Invalid email format.";
-
-//     // phone basic check E.164-ish
-//     if (!form.phone || !/^\+?[0-9]{7,15}$/.test(form.phone)) e.phone = "Phone required in digits (E.164-ish).";
-
-//     // aadhaar
-//     if (!form.aadhaar && !/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Aadhaar must be 12 digits.";
-
-//     // password only required when creating new (admin provides or set-password flow)
-//     if (!editId) {
-//       const pw = form.password || "";
-//       if (!pw || pw.length < 8 || !/[A-Z]/.test(pw) || !/[a-z]/.test(pw) || !/[0-9]/.test(pw)) {
-//         e.password = "Password must be min 8 chars, include uppercase, lowercase and digit.";
-//       }
-//     }
-
-//     // relationship required
-//     if (!form.relationship_to_child) e.relationship_to_child = "Relationship is required.";
-
-//     // pincode digits if provided
-//     if (form.address?.pincode && !/^[0-9]{4,10}$/.test(form.address.pincode)) e.pincode = "Invalid pincode.";
-
-//     setErrors(e);
-//     return Object.keys(e).length === 0;
-//   }
-
-//   // upload photo
-//   async function handlePhotoUpload(file?: File | null) {
-//     if (!file) return "";
-//     if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
-//       toast.error("Invalid image type (jpg/png)");
-//       return "";
-//     }
-//     if (file.size > 5 * 1024 * 1024) {
-//       toast.error("Max size 5MB");
-//       return "";
-//     }
-
-//     const fd = new FormData();
-//     fd.append("file", file);
-
-//     try {
-//       const headers: HeadersInit = {};
-//       const auth = getAuthHeader();
-//       if (auth.Authorization) (headers as Record<string, string>)["Authorization"] = auth.Authorization;
-
-//       const res = await fetch("/api/upload/parent-photo", {
-//         method: "POST",
-//         body: fd,
-//         // DO NOT set Content-Type for FormData; browser will set boundary
-//         headers,
-//       });
-//       const data = await res.json();
-//       if (!data?.status) {
-//         toast.error(data?.message || "Upload failed");
-//         return "";
-//       }
-//       return data.data?.url || "";
-//     } catch (err) {
-//       console.error("photo upload", err);
-//       toast.error("Upload failed");
-//       return "";
-//     }
-//   }
-
-//   // submit
-//   async function handleSubmit(e?: React.FormEvent) {
-//     e?.preventDefault();
-//     if (!validateForm()) {
-//       toast.error("Fix validation errors");
-//       return;
-//     }
-
-//     setSaving(true);
-
-//     try {
-//       // if profile_photo is a File object in form.profile_photo_file, upload first
-//       let profilePhotoUrl = form.profile_photo;
-//       if ((form as any).profile_photo_file instanceof File) {
-//         const uploaded = await handlePhotoUpload((form as any).profile_photo_file);
-//         if (uploaded) profilePhotoUrl = uploaded;
-//         else {
-//           setSaving(false);
-//           return;
-//         }
-//       }
-
-//       const payload: any = {
-//         first_name: form.first_name,
-//         middle_name: form.middle_name,
-//         last_name: form.last_name,
-//         email: form.email || undefined,
-//         phone: form.phone,
-//         aadhaar: form.aadhaar || undefined,
-//         password: form.password || undefined,
-//         preferred_language: form.preferred_language || undefined,
-//         relationship_to_child: form.relationship_to_child,
-//         address: {
-//           line1: form.address.line1,
-//           line2: form.address.line2,
-//           city: form.address.city,
-//           pincode: form.address.pincode,
-//           country: form.address.country || undefined,
-//           state: form.address.state || undefined,
-//           district: form.address.district || undefined,
-//         },
-//         national_id: form.national_id || undefined,
-//         profile_photo: profilePhotoUrl || undefined,
-//         consent_whatsapp: !!form.consent_whatsapp,
-//         terms_accepted: !!form.terms_accepted,
-//         admin_notes: form.admin_notes || undefined,
-//         is_active: typeof form.is_active === "boolean" ? form.is_active : true,
-//       };
-
-//       let url = "/api/admin/create-parent";
-//       let method: "POST" | "PUT" = "POST";
-//       if (editId) {
-//         url = `/api/admin/parents/${editId}`;
-//         method = "PUT";
-//       }
-
-//       const headers: HeadersInit = { "Content-Type": "application/json" };
-//       const auth = getAuthHeader();
-//       if (auth.Authorization) (headers as Record<string, string>)["Authorization"] = auth.Authorization;
-
-//       const res = await fetch(url, {
-//         method,
-//         headers,
-//         body: JSON.stringify(payload),
-//       });
-
-//       const data = await res.json();
-//       if (!data?.status) {
-//         toast.error(data?.message || "Operation failed");
-//         // show server validation errors if present
-//         if (data?.errors && typeof data.errors === "object") {
-//           setErrors((prev) => ({ ...prev, ...data.errors }));
-//         }
-//         setSaving(false);
-//         return;
-//       }
-
-//       toast.success(editId ? "Parent updated" : "Parent created");
-//       router.push("/admin/parents");
-//     } catch (err) {
-//       console.error("submit error", err);
-//       toast.error("Server error");
-//     } finally {
-//       setSaving(false);
-//     }
-//   }
-
-//   // handlers for country/state/district changes
-//   function handleCountryChange(countryId: string) {
-//     setForm((prev: any) => ({ ...prev, address: { ...prev.address, country: countryId, state: "", district: "" } }));
-//     setStates([]);
-//     setDistricts([]);
-//     fetchStatesForCountry(countryId);
-//   }
-
-//   function handleStateChange(stateId: string) {
-//     setForm((prev: any) => ({ ...prev, address: { ...prev.address, state: stateId, district: "" } }));
-//     setDistricts([]);
-//     fetchDistrictsForState(stateId);
-//   }
-
-//   // file input change
-//   function onPhotoFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-//     const file = e.target.files?.[0] || null;
-//     setForm((prev: any) => ({ ...prev, profile_photo_file: file, profile_photo: file ? "" : prev.profile_photo }));
-//   }
 "use client";
 
 import React, { Fragment, useEffect, useState } from "react";
@@ -529,6 +115,49 @@ export default function AdminAddEditParentPage() {
     setDistricts(j?.status ? j.data : []);
   }
 
+async function handlePincodeLookup(pincode: string) {
+  if (!/^\d{6}$/.test(pincode)) return;
+
+  const res = await fetch(`/api/settings/pincode-lookup?pincode=${pincode}`);
+  const j = await res.json();
+
+  if (!j.status) {
+    toast.info("Pincode not found, please fill address manually");
+    return;
+  }
+
+  const d = j.data;
+
+  const countryId = d.country?._id?.toString() || "";
+  const stateId =
+    typeof d.state === "string"
+      ? d.state
+      : d.state?._id?.toString() || "";
+  const districtId =
+    typeof d.district === "string"
+      ? d.district
+      : d.district?._id?.toString() || "";
+
+  // preload dropdowns
+  if (countryId) await fetchStates(countryId);
+  if (stateId) await fetchDistricts(stateId);
+
+  setForm((prev: any) => ({
+    ...prev,
+    address: {
+      ...prev.address,
+      pincode,
+      country: countryId,
+      state: stateId,
+      district: districtId,
+    //  city: d.circlename || "",
+    },
+  }));
+
+  toast.success("Address auto-filled from pincode");
+}
+
+
   // file input change
   function onPhotoFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] || null;
@@ -566,6 +195,10 @@ export default function AdminAddEditParentPage() {
 
       if (a.country) await fetchStates(a.country._id || a.country);
       if (a.state) await fetchDistricts(a.state._id || a.state);
+      if (a.pincode && String(a.pincode).length === 6) {
+  handlePincodeLookup(String(a.pincode));
+}
+
     } catch {
       toast.error("Failed to load parent");
     } finally {
@@ -578,7 +211,11 @@ export default function AdminAddEditParentPage() {
     if (editId) {
     loadForEdit(editId);
     fetchAuditLogs(editId); // 👈 ADD THIS
+
+   
   }
+
+
     // eslint-disable-next-line
   }, [editId]);
 
@@ -628,7 +265,7 @@ export default function AdminAddEditParentPage() {
   }
 
   /* ================= SUBMIT ================= */
-
+/*
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validateForm()) return toast.error("Fix validation errors");
@@ -663,6 +300,71 @@ export default function AdminAddEditParentPage() {
       setSaving(false);
     }
   }
+*/
+
+async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  if (!validateForm()) return toast.error("Fix validation errors");
+
+  setSaving(true);
+  try {
+    const fd = new FormData();
+
+    // simple fields
+    fd.append("first_name", form.first_name);
+    fd.append("middle_name", form.middle_name);
+    fd.append("last_name", form.last_name);
+    fd.append("email", form.email);
+    fd.append("phone", form.phone.replace(/\D/g, ""));
+    fd.append("aadhaar", form.aadhaar || "");
+    fd.append("preferred_language", form.preferred_language || "");
+    fd.append("relationship_to_child", form.relationship_to_child || "");
+    fd.append("national_id", form.national_id || "");
+    fd.append("admin_notes", form.admin_notes || "");
+    fd.append("is_active", String(form.is_active));
+    fd.append("consent_whatsapp", String(form.consent_whatsapp));
+    fd.append("terms_accepted", String(form.terms_accepted));
+
+    if (form.password) {
+      fd.append("password", form.password);
+    }
+
+    // address
+    fd.append("address[line1]", form.address.line1 || "");
+    fd.append("address[line2]", form.address.line2 || "");
+    fd.append("address[country]", form.address.country || "");
+    fd.append("address[state]", form.address.state || "");
+    fd.append("address[district]", form.address.district || "");
+    fd.append("address[city]", form.address.city || "");
+    fd.append("address[pincode]", form.address.pincode || "");
+
+    // ✅ FILE (MOST IMPORTANT)
+    if (form.profile_photo_file) {
+      fd.append("profile_photo", form.profile_photo_file);
+    }
+
+    const res = await fetch(
+      editId ? `/api/admin/parents/${editId}` : "/api/admin/create-parent",
+      {
+        method: editId ? "PUT" : "POST",
+        headers: {
+          ...getAuthHeader(), // ❌ Content-Type mat do
+        },
+        body: fd,
+      }
+    );
+
+    const j = await res.json();
+    if (!j?.status) throw new Error();
+
+    toast.success(editId ? "Parent updated" : "Parent created");
+    router.push("/admin/parents");
+  } catch (err) {
+    toast.error("Save failed");
+  } finally {
+    setSaving(false);
+  }
+}
 
   // log function
 const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -684,6 +386,33 @@ async function fetchAuditLogs(parentId: string) {
     setAuditLoading(false);
   }
 }
+
+function renderValue(value: any) {
+  if (value === null || value === undefined) return "-";
+
+  if (typeof value === "object") {
+    // address object case
+    if (value.line1 || value.pincode) {
+      return [
+        value.line1,
+        value.line2,
+        value.city,
+        value.district?.name || value.district,
+        value.state?.name || value.state,
+        value.country?.name || value.country,
+        value.pincode,
+      ]
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    // generic object fallback
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+}
+
 
   return (
     <Fragment>
@@ -797,18 +526,15 @@ async function fetchAuditLogs(parentId: string) {
 
   {/* quick TS bypass: treat SpkSelect props as any so onChange allowed */}
   <SpkSelect
-    {...({
-      option: relationships,
-      defaultvalue: relationships.find((r) => r.value === form.relationship_to_child)
-        ? [relationships.find((r) => r.value === form.relationship_to_child)]
-        : [],
-      key: `rel-${form.relationship_to_child || "new"}`,
-      onChange: (opt: any) => setForm({ ...form, relationship_to_child: opt?.value || "" }),
-      placeholder: "Select relationship",
-      classNameprefix: "Select2",
-      menuplacement: "auto",
-    } as any)}
-  />
+  {...({
+    option: relationships,
+    value: relationships.find(r => r.value === form.relationship_to_child) || null,
+    onChange: (opt: any) =>
+      setForm((prev: any) => ({ ...prev, relationship_to_child: opt?.value || "" })),
+    placeholder: "Select relationship",
+    classNameprefix: "Select2",
+  } as any)}
+/>
 
   {errors.relationship_to_child && <div className="text-danger small mt-1">{errors.relationship_to_child}</div>}
 </Col>
@@ -817,104 +543,16 @@ async function fetchAuditLogs(parentId: string) {
 <Col xl={6}>
   <Form.Label>Preferred Language</Form.Label>
   <SpkSelect
-    {...({
-      option: languages,
-      defaultvalue: languages.find((r) => r.value === form.preferred_language)
-        ? [languages.find((r) => r.value === form.preferred_language)]
-        : [],
-      key: `rel-${form.preferred_language || "new"}`,
-      onChange: (opt: any) => setForm({ ...form, preferred_language: opt?.value || "" }),
-      placeholder: "Select languages",
-      classNameprefix: "Select2",
-      menuplacement: "auto",
-    } as any)}
-  />
+  {...({
+    option: languages,
+    value: languages.find(l => l.value === form.preferred_language) || null,
+    onChange: (opt: any) =>
+      setForm((prev: any) => ({ ...prev, preferred_language: opt?.value || "" })),
+    placeholder: "Select language",
+  } as any)}
+/>
 </Col>
-                  {/* address fields
-                  <Col xl={12}>
-                    <Form.Label>Address</Form.Label>
-                  </Col>
-
-                  <Col xl={6}>
-                    <Form.Label>Line 1</Form.Label>
-                    <Form.Control
-                      value={form.address.line1}
-                      onChange={(e) => setForm({ ...form, address: { ...form.address, line1: e.target.value } })}
-                    />
-                  </Col>
-
-                  <Col xl={6}>
-                    <Form.Label>Line 2</Form.Label>
-                    <Form.Control
-                      value={form.address.line2}
-                      onChange={(e) => setForm({ ...form, address: { ...form.address, line2: e.target.value } })}
-                    />
-                  </Col>
-
-                  <Col xl={4}>
-                    <Form.Label>Country</Form.Label>
-                    <Form.Select
-                      value={form.address.country || ""}
-                      onChange={(e) => handleCountryChange(e.target.value)}
-                    >
-                      <option value="">Select Country</option>
-                      {countries.map((c) => (
-                        <option key={c._id} value={c._id}>
-                          {c.name} ({c.code})
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Col>
-
-                  <Col xl={4}>
-                    <Form.Label>State</Form.Label>
-                    <Form.Select
-                      value={form.address.state || ""}
-                      onChange={(e) => handleStateChange(e.target.value)}
-                      disabled={!form.address.country}
-                    >
-                      <option value="">{form.address.country ? "Select State" : "Select Country first"}</option>
-                      {states.map((s) => (
-                        <option key={s._id} value={s._id}>
-                          {s.name} ({s.code})
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Col>
-
-                  <Col xl={4}>
-                    <Form.Label>District</Form.Label>
-                    <Form.Select
-                      value={form.address.district || ""}
-                      onChange={(e) => setForm({ ...form, address: { ...form.address, district: e.target.value } })}
-                      disabled={!form.address.state}
-                    >
-                      <option value="">{form.address.state ? "Select District" : "Select State first"}</option>
-                      {districts.map((d) => (
-                        <option key={d._id} value={d._id}>
-                          {d.name} ({d.code})
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Col>
-
-                  <Col xl={4}>
-                    <Form.Label>City</Form.Label>
-                    <Form.Control
-                      value={form.address.city}
-                      onChange={(e) => setForm({ ...form, address: { ...form.address, city: e.target.value } })}
-                    />
-                  </Col>
-
-                  <Col xl={4}>
-                    <Form.Label>Pincode</Form.Label>
-                    <Form.Control
-                      value={form.address.pincode}
-                      onChange={(e) => setForm({ ...form, address: { ...form.address, pincode: e.target.value } })}
-                      isInvalid={!!errors.pincode}
-                    />
-                    <Form.Control.Feedback type="invalid">{errors.pincode}</Form.Control.Feedback>
-                  </Col> */}
+            
 {/* ================= ADDRESS ================= */}
 <Col xl={12}>
   <Form.Label className="fw-semibold">Address</Form.Label>
@@ -944,6 +582,49 @@ async function fetchAuditLogs(parentId: string) {
       })
     }
   />
+</Col>
+
+<Col xl={4}>
+  <Form.Label>Pincode</Form.Label>
+  <Form.Control
+    value={form.address.pincode}
+    maxLength={6}
+    onChange={(e) => {
+  const val = e.target.value.replace(/\D/g, "");
+
+  setForm((prev: any) => ({
+    ...prev,
+    address: { ...prev.address, pincode: val },
+  }));
+
+  // 👇 CLEAR CASE
+  if (val.length < 6) {
+    setForm((prev: any) => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        pincode: val,
+        country: "",
+        state: "",
+        district: "",
+        city: "",
+      },
+    }));
+    setStates([]);
+    setDistricts([]);
+    return;
+  }
+
+  // 👇 LOOKUP CASE
+  handlePincodeLookup(val);
+}
+  }
+    isInvalid={!!errors.pincode}
+    placeholder="Enter 6 digit pincode"
+  />
+  <Form.Control.Feedback type="invalid">
+    {errors.pincode}
+  </Form.Control.Feedback>
 </Col>
 
 <Col xl={4}>
@@ -982,14 +663,16 @@ async function fetchAuditLogs(parentId: string) {
     disabled={!form.address.country}
     onChange={(e) => {
       const stateId = e.target.value;
-      setForm({
-        ...form,
+
+      setForm((prev:any) => ({
+        ...prev,
         address: {
-          ...form.address,
+          ...prev.address,
           state: stateId,
           district: "",
         },
-      });
+      }));
+
       setDistricts([]);
       if (stateId) fetchDistricts(stateId);
     }}
@@ -997,13 +680,15 @@ async function fetchAuditLogs(parentId: string) {
     <option value="">
       {form.address.country ? "Select State" : "Select Country first"}
     </option>
+
     {states.map((s) => (
-      <option key={s._id} value={s._id}>
+      <option key={s._id} value={String(s._id)}>
         {s.name} ({s.code})
       </option>
     ))}
   </Form.Select>
 </Col>
+
 
 <Col xl={4}>
   <Form.Label>District</Form.Label>
@@ -1019,7 +704,7 @@ async function fetchAuditLogs(parentId: string) {
   >
     <option value="">
       {form.address.state ? "Select District" : "Select State first"}
-    </option>
+    </option> 
     {districts.map((d) => (
       <option key={d._id} value={d._id}>
         {d.name} ({d.code})
@@ -1031,32 +716,18 @@ async function fetchAuditLogs(parentId: string) {
 <Col xl={4}>
   <Form.Label>City</Form.Label>
   <Form.Control
-    value={form.address.city}
-    onChange={(e) =>
-      setForm({
-        ...form,
-        address: { ...form.address, city: e.target.value },
-      })
-    }
-  />
+  value={form.address.city}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      address: { ...form.address, city: e.target.value },
+    })
+  }
+  placeholder="City / Area"
+/>
 </Col>
 
-<Col xl={4}>
-  <Form.Label>Pincode</Form.Label>
-  <Form.Control
-    value={form.address.pincode}
-    onChange={(e) =>
-      setForm({
-        ...form,
-        address: { ...form.address, pincode: e.target.value },
-      })
-    }
-    isInvalid={!!errors.pincode}
-  />
-  <Form.Control.Feedback type="invalid">
-    {errors.pincode}
-  </Form.Control.Feedback>
-</Col>
+
 {/* ================= END ADDRESS ================= */}
 
                   {/* national id */}
@@ -1149,13 +820,13 @@ async function fetchAuditLogs(parentId: string) {
           </Card>
         </Col>
       </Row>
-<Row>
+{/* <Row>
 <Col>
 <Card className="mt-4">
   <Card.Header>
     <Card.Title>Audit History</Card.Title>
   </Card.Header>
-  <Card.Body>
+  {/* <Card.Body>
     {auditLoading && <div className="text-muted">Loading audit history…</div>}
 
     {!auditLoading && auditLogs.length === 0 && (
@@ -1164,10 +835,12 @@ async function fetchAuditLogs(parentId: string) {
 
     {auditLogs.map((log: any) => (
       <div key={log._id} className="mb-3">
-        <strong>{log.action}</strong>{" "}
-        <small className="text-muted">
-          ({new Date(log.createdAt).toLocaleString()})
-        </small>
+          <div className="fw-semibold">
+          {log.action}
+          <small className="text-muted ms-2">
+            {new Date(log.createdAt).toLocaleString()}
+          </small>
+        </div>
 
         {Object.keys(log.changes || {}).length > 0 && (
           <ul className="mt-2">
@@ -1180,13 +853,70 @@ async function fetchAuditLogs(parentId: string) {
               </li>
             ))}
           </ul>
+          
         )}
       </div>
+
+      
     ))}
+
+    
+  </Card.Body> */}
+ {/*</Fragment><Card.Body>
+    <div className="audit-timeline">
+  {auditLogs.map(log => (
+    <div key={log._id} className="audit-item d-flex mb-3">
+      
+    
+      <div className="me-3">
+        <span
+          className={`audit-dot bg-${
+            log.action === "CREATE"
+              ? "success"
+              : log.action === "DELETE"
+              ? "danger"
+              : "primary"
+          }`}
+        />
+      </div>
+
+      
+      <div>
+        <div className="fw-semibold">
+          {log.action}
+          <small className="text-muted ms-2">
+            {new Date(log.createdAt).toLocaleString()}
+          </small>
+        </div>
+
+        <ul className="small mt-1">
+          {Object.entries(log.changes).map(([field, val]: any) => (
+          <li key={field}>
+            <strong>{field}</strong> :
+             {field === "address" ? (
+              <div className="small text-muted">
+                <div>Old: {renderValue(val.old)}</div>
+                <div>New: {renderValue(val.new)}</div>
+              </div>
+            ) : (
+          <span>
+            <span className="text-danger ms-1">{val.old?.label ?? val.old}</span>
+              {" → "}
+              <span className="text-success">{val.new?.label ?? val.new}</span>
+          </span>
+          )}
+          </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  ))}
+</div>
+
   </Card.Body>
 </Card>
 </Col>
-</Row>
+</Row> */}
       <ToastContainer position="top-right" autoClose={2000} />
     </Fragment>
   );

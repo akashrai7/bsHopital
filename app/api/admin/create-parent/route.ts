@@ -280,10 +280,24 @@ export async function POST(req: Request) {
     /* ---------- CREATE ---------- */
     const hashed = await bcrypt.hash(passwordRaw, SALT_ROUNDS);
 
-    let parent_uid = generateParentUID();
-    while (await ParentMaster.findOne({ parent_uid }).lean()) {
-      parent_uid = generateParentUID();
-    }
+    // let parent_uid = generateParentUID();
+    // while (await ParentMaster.findOne({ parent_uid }).lean()) {
+    //   parent_uid = generateParentUID();
+    // }
+    
+    /* ✅ SAFE child_id generation */
+        const lastParent = await ParentMaster.findOne()
+          .sort({ createdAt: -1 })
+          .select("parent_uid")
+          .lean();
+    
+        const lastNumber = lastParent
+          ? parseInt(lastParent.parent_uid.replace("PAR", ""), 10)
+          : 0;
+    
+        const parent_uid = `PAR${String(lastNumber + 1).padStart(5, "0")}`;
+    
+
 
     const doc = await ParentMaster.create({
       parent_uid,

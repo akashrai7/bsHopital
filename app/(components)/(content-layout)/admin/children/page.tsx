@@ -313,12 +313,12 @@ export default function ChildrenListPage() {
                     <tr>
                       <th>#</th>
                       <th>Child UID</th>
-                      <th>Name</th>
-                      <th>Parent name</th>
+                      <th style={{ width: 200 }}>Name</th>
+                      <th style={{ width: 200 }}>Parent name</th>
                       <th>Gender</th>
                       <th>Contact</th>
                       <th>DOB</th>
-                      <th>Hospital name</th>
+                      <th style={{ width: 210 }}>Hospital name</th>
                       <th className="text-center">Actions</th>
                     </tr>
                   </thead>
@@ -326,13 +326,13 @@ export default function ChildrenListPage() {
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan={7} className="text-center">
+                        <td colSpan={9} className="text-center">
                           Loading...
                         </td>
                       </tr>
                     ) : children.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="text-center text-muted">
+                        <td colSpan={9} className="text-center text-muted">
                           No records found
                         </td>
                       </tr>

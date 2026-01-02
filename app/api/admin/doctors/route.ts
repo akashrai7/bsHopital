@@ -1,3 +1,5 @@
+// api/admin/doctors/route.ts
+
 import { connectMongo } from "@/lib/mongoose";
 import DoctorMaster from "@/models/DoctorMaster";
 import { success, error } from "@/lib/response";
@@ -15,12 +17,6 @@ export async function POST(req: Request) {
   try {
     await connectMongo();
 
-    // Admin auth: Expect Authorization: Bearer <token>
-    // const auth = req.headers.get("authorization") || "";
-    // if (!auth.startsWith("Bearer ")) {
-    //   return error("Unauthorized.", {}, 401);
-    // }
-    // const token = auth.split(" ")[1];
 
 const cookieHeader = req.headers.get("cookie") || "";
 let tokenFromCookie = "";

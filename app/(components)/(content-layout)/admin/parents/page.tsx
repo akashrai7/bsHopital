@@ -163,7 +163,7 @@ export default function ParentsListPage() {
                       <th>City</th>
                       <th>District</th>
                       <th>State</th>
-                      <th>Child Name</th>
+                      <th style={{ width: 160 }}>Child Name</th>
                       <th style={{ width: 220 }}>Actions</th>
                     </tr>
                   </thead>
@@ -195,25 +195,25 @@ export default function ParentsListPage() {
                           <td>{p.address?.city || "-"}</td>
                           <td>{p.address?.district?.name || "-"}</td>
                           <td>{p.address?.state?.name || "-"}</td>
-                         <td>
-  {p.children?.length ? (
-    <div className="d-flex flex-column gap-1">
-      {p.children.map((c: any) => (
-        <Button
-          key={c._id}
-          variant="link"
-          size="sm"
-          className="p-0 text-start"
+
+<td>
+  {Array.isArray(p.children) && p.children.length > 0 ? (
+    p.children.map((c: any, idx: number) => (
+      <div key={c._id}>
+        <span
+          style={{ cursor: "pointer" }}
+          className="text-primary text-decoration-underline"
           onClick={() =>
-            router.push(`/admin/children/profile-?id=${c._id}`)
+            router.push(`/admin/children/profile?id=${c._id}`)
           }
         >
           {c.full_name}
-        </Button>
-      ))}
-    </div>
+        </span>
+        {idx < p.children.length - 1 && ", "}
+      </div>
+    ))
   ) : (
-    <span className="text-muted">0</span>
+    <span className="text-muted">—</span>
   )}
 </td>
                           <td>
@@ -231,16 +231,16 @@ export default function ParentsListPage() {
                             {/* Profile */}
                             <Button
                               size="sm"
-                              variant="info"
+                              variant="success"
                               className="me-1"
                               onClick={() =>
-                                router.push(`/admin/parents/profile?id=${p._id}`)
+                                router.push(`/admin/parents/profile-?id=${p._id}`)
                               }
                             >
-                              👁 View
+                              View
                             </Button>
                             {/* AUDIT */}
-                            <Button
+                            {/* <Button
                               size="sm"
                               variant="info"
                               className="me-1"
@@ -248,8 +248,8 @@ export default function ParentsListPage() {
                                 router.push(`/admin/parents/add?id=${p._id}#audit`)
                               }
                             >
-                              👁 Log
-                            </Button>
+                              Log
+                            </Button> */}
 
                             {/* DELETE */}
                             <Button

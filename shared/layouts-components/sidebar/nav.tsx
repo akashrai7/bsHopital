@@ -104,6 +104,9 @@ export const MENUITEMS: any = [
   path: "/admin/children", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Childs"
  },
  { 
+  path: "/admin/doctors/add", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "New Doctors"
+ },
+ { 
   path: "/admin/doctors", type: "link", icon: Svgicons.Profileicon, active: false, selected: false, dirchange: false, title: "Doctors"
  }
     ]

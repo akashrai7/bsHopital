@@ -160,7 +160,7 @@ export default function ChildProfilePage() {
                           <button
                             className="btn btn-sm btn-light mt-2"
                             onClick={() =>
-                              router.push(`/admin/parents/add?id=${p._id}`)
+                              router.push(`/admin/parents/profile?id=${p._id}`)
                             }
                           >
                             View Parent
