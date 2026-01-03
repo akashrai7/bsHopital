@@ -154,8 +154,82 @@ function cryptoRandomPassword(length = 10) {
   return crypto.randomBytes(Math.ceil(length * 0.75)).toString("base64").slice(0, length);
 }
 
-export async function GET() {
-  await connectMongo();
-  const doctors = await DoctorMaster.find().sort({ createdAt: -1 }).lean();
-  return success("Doctors list", doctors);
+// export async function GET() {
+//   await connectMongo();
+//   const doctors = await DoctorMaster.find().sort({ createdAt: -1 }).lean();
+//   return success("Doctors list", doctors);
+// }
+
+export async function GET(req: Request) {
+  try {
+    await connectMongo();
+
+    /* ===== AUTH (same logic as POST) ===== */
+    const cookieHeader = req.headers.get("cookie") || "";
+    let tokenFromCookie = "";
+    if (cookieHeader) {
+      const cookies = Object.fromEntries(
+        cookieHeader.split(";").map((s) => s.trim().split("="))
+      );
+      tokenFromCookie =
+        cookies["accessToken"] || cookies["access_token"] || cookies["jwt"] || "";
+    }
+
+    const authHeader =
+      req.headers.get("authorization") ||
+      (tokenFromCookie ? `Bearer ${tokenFromCookie}` : "");
+
+    if (!authHeader.startsWith("Bearer ")) {
+      return error("Unauthorized.", {}, 401);
+    }
+
+    const token = authHeader.split(" ")[1];
+    const payload = await verifyAccessToken(token);
+    if (!payload || payload.role !== "admin") {
+      return error("Forbidden.", {}, 403);
+    }
+
+    /* ===== QUERY PARAMS ===== */
+    const { searchParams } = new URL(req.url);
+
+    const page = Math.max(Number(searchParams.get("page")) || 1, 1);
+    const limit = Math.min(Number(searchParams.get("limit")) || 20, 100);
+    const search = searchParams.get("search")?.trim();
+
+    const filter: any = {};
+
+    if (search) {
+      filter.$or = [
+        { first_name: new RegExp(search, "i") },
+        { last_name: new RegExp(search, "i") },
+        { phone: new RegExp(search, "i") },
+        { email: new RegExp(search, "i") },
+        { doctor_uid: new RegExp(search, "i") },
+      ];
+    }
+
+    const [rows, total] = await Promise.all([
+      DoctorMaster.find(filter)
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+
+      DoctorMaster.countDocuments(filter),
+    ]);
+
+    return success("Doctors list", {
+      data: rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err: any) {
+    console.error("GET /api/admin/doctors error:", err);
+    return error("Server error.", { server: err.message }, 500);
+  }
 }

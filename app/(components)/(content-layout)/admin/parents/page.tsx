@@ -4,8 +4,9 @@ import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Seo from "@/shared/layouts-components/seo/seo";
 import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-import { Card, Col, Row, Table, Form, Button } from "react-bootstrap";
+import { Card, Col, Row, Table, Form, Button, Badge } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
+
 
 /* ================= helpers ================= */
 
@@ -195,27 +196,27 @@ export default function ParentsListPage() {
                           <td>{p.address?.city || "-"}</td>
                           <td>{p.address?.district?.name || "-"}</td>
                           <td>{p.address?.state?.name || "-"}</td>
-
 <td>
   {Array.isArray(p.children) && p.children.length > 0 ? (
-    p.children.map((c: any, idx: number) => (
-      <div key={c._id}>
-        <span
+    <div className="d-flex flex-wrap gap-1">
+      {p.children.map((c: any) => (
+        <Badge
+          key={c._id}
+          bg="primary-gradient"
           style={{ cursor: "pointer" }}
-          className="text-primary text-decoration-underline"
           onClick={() =>
             router.push(`/admin/children/profile?id=${c._id}`)
           }
         >
           {c.full_name}
-        </span>
-        {idx < p.children.length - 1 && ", "}
-      </div>
-    ))
+        </Badge>
+      ))}
+    </div>
   ) : (
     <span className="text-muted">—</span>
   )}
 </td>
+
                           <td>
                             {/* EDIT */}
                             <Button

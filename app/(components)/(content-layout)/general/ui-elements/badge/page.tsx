@@ -73,6 +73,10 @@ const Badge: React.FC<BadgePrps> = () => {
                             <SpkBadge key={index} Customclass={` bg-${badge1.color}-gradient`}>{badge1.heading}</SpkBadge>
                         ))}
                     </ShowCode>
+
+                      {badges1.map((badge1, index) => (
+                            <SpkBadge key={index} Customclass={` bg-${badge1.color}-gradient`}>{badge1.heading}</SpkBadge>
+                        ))}
                 </Col>
                 <Col xl={12}>
                     <ShowCode title="Gradient Pill Badges" customCardClass="custom-card" customCardBodyClass="d-flex flex-wrap gap-2" reactCode={uielementsprism.Gradientpill} dataCode={uielementsprism.Gradientdata} reusableCode={uielementsprism.Gradientpillreuse}>
