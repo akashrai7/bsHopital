@@ -63,7 +63,7 @@ export default function AdminAddEditParentPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const [isPincodeLocked, setIsPincodeLocked] = useState(false);
   /* ================= HELPERS ================= */
 
   function getAuthHeader(): Record<string, string> {
@@ -122,7 +122,8 @@ async function handlePincodeLookup(pincode: string) {
   const j = await res.json();
 
   if (!j.status) {
-    toast.info("Pincode not found, please fill address manually");
+    toast.info("Pincode not found, please contact admin");
+    setIsPincodeLocked(false);
     return;
   }
 
@@ -154,6 +155,7 @@ async function handlePincodeLookup(pincode: string) {
     },
   }));
 
+  setIsPincodeLocked(true);
   toast.success("Address auto-filled from pincode");
 }
 
@@ -631,6 +633,7 @@ function renderValue(value: any) {
   <Form.Label>Country</Form.Label>
   <Form.Select
     value={form.address.country || ""}
+    disabled={isPincodeLocked || form.address.country || !form.address.country}
     onChange={(e) => {
       const countryId = e.target.value;
       setForm({
@@ -655,12 +658,12 @@ function renderValue(value: any) {
     ))}
   </Form.Select>
 </Col>
-
+{/* disabled={!form.address.country} */}
 <Col xl={4}>
   <Form.Label>State</Form.Label>
   <Form.Select
     value={form.address.state || ""}
-    disabled={!form.address.country}
+    disabled={isPincodeLocked || form.address.state || !form.address.state }
     onChange={(e) => {
       const stateId = e.target.value;
 
@@ -694,7 +697,7 @@ function renderValue(value: any) {
   <Form.Label>District</Form.Label>
   <Form.Select
     value={form.address.district || ""}
-    disabled={!form.address.state}
+    disabled={form.address.state || !form.address.district || form.address.district || isPincodeLocked} 
     onChange={(e) =>
       setForm({
         ...form,
@@ -712,7 +715,6 @@ function renderValue(value: any) {
     ))}
   </Form.Select>
 </Col>
-
 <Col xl={4}>
   <Form.Label>City</Form.Label>
   <Form.Control

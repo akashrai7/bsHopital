@@ -47,6 +47,7 @@ export const MENUITEMS: any = [
           { path: "/settings/countries/", type: "link", active: false, selected: false, dirchange: false, title: "Country" },
           { path: "/settings/states/", type: "link", active: false, selected: false, dirchange: false, title: "States" },
           { path: "/settings/districts/", type: "link", active: false, selected: false, dirchange: false, title: "Districts" },
+          { path: "/settings/pincodes/", type: "link", active: false, selected: false, dirchange: false, title: "Pincode/city" },
           { path: "/settings/specialties/", type: "link", active: false, selected: false, dirchange: false, title: "Specialties" },
          
 

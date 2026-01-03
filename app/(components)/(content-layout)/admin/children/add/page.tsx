@@ -419,7 +419,7 @@ export default function ChildAddEditPage() {
   /* ================= PARENT LOOKUP ================= */
 
   async function handleLookupParent() {
-    if (!/^\d{4}-\d{4}-\d{4}$/.test(lookupAadhaar)) {
+    if (!/^\d{12}$/.test(lookupAadhaar)) {
       toast.error("Aadhaar format: xxxx-xxxx-xxxx");
       return;
     }
