@@ -79,7 +79,7 @@ export default function ChildAuditTimeline({ childId }: { childId: string }) {
               </div>
 
               <div className="mt-2 ps-3">
-                {Object.keys(log.changes).length === 0 ? (
+                {!log.changes || Object.keys(log.changes).length === 0 ? (
                   <em>No field changes</em>
                 ) : (
                   <ul className="mb-0">

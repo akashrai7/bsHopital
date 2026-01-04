@@ -36,6 +36,16 @@ export interface IParentMaster extends Document {
   createdAt: Date;
   updatedAt: Date;
   is_active: boolean;
+  kyc: {
+  status: {
+    type: String,
+    enum: ["not_started", "otp_sent", "verified", "failed"],
+    default: "not_started"
+  },
+  verifiedAt: { type: Date },
+  lastAttemptAt: { type: Date },
+  totalAttempts: { type: Number, default: 0 }
+}
 }
 
 const ParentAddressSchema = new Schema<IParentAddress>(

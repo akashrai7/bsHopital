@@ -109,24 +109,137 @@ async function getAuthToken(req: Request) {
   return verifyAccessToken(token); // ✅ real verification
 }
 
+// export async function POST(req: Request) {
+//   try {
+//     await connectMongo();
+//     const user = await getAuthToken(req);
+
+//     const body = await req.json();
+
+//     if (
+//       !body.full_name ||
+//       !body.dob ||
+//       !body.gender_code ||
+//       !Array.isArray(body.parent_ids) ||
+//       body.parent_ids.length === 0
+//     ) {
+//       return error("Required fields missing", {}, 422);
+//     }
+
+//     /* ✅ validate parents in ONE query */
+//     const parents = await ParentMaster.find({
+//       _id: { $in: body.parent_ids },
+//     }).select("_id");
+
+//     if (parents.length !== body.parent_ids.length) {
+//       return error("One or more parents not found", {}, 422);
+//     }
+
+//     /* ✅ SAFE child_id generation */
+//     const lastChild = await ChildMaster.findOne()
+//       .sort({ createdAt: -1 })
+//       .select("child_id")
+//       .lean();
+
+//     const lastNumber = lastChild
+//       ? parseInt(lastChild.child_id.replace("CHD", ""), 10)
+//       : 0;
+
+//     const child_id = `CHD${String(lastNumber + 1).padStart(5, "0")}`;
+
+//     const doc = await ChildMaster.create({
+//       child_id,
+//       full_name: body.full_name.trim(),
+//       dob: new Date(body.dob),
+//       gender_code: body.gender_code,
+//       blood_group_code: body.blood_group_code,
+//       birth_weight_kg: body.birth_weight_kg,
+//       birth_length_cm: body.birth_length_cm,
+//       place_of_birth: body.place_of_birth,
+//       hospital_name: body.hospital_name,
+//       birth_registration_id: body.birth_registration_id,
+//       parent_ids: body.parent_ids,
+//       photo: body.photo,
+//       primary_contact: body.primary_contact,
+//       preferred_clinic_id: body.preferred_clinic_id,
+//       notes: body.notes,
+//       consent_data_sharing: body.consent_data_sharing,
+//       created_by: user.id, // 🔐 audit ready
+//     });
+
+//     await ChildAuditLog.create({
+//   child_id: doc._id,
+//   action: "CREATE",
+//   changed_by: user.id,
+//   changed_by_role: user.role,
+//   changes: {},
+// });
+
+
+//     return success("Child created", doc);
+//   } catch (e: any) {
+//     return error(
+//       e.message === "Unauthorized" ? "Unauthorized" : "Server error",
+//       {},
+//       e.message === "Unauthorized" ? 401 : 500
+//     );
+//   }
+// }
 export async function POST(req: Request) {
   try {
     await connectMongo();
     const user = await getAuthToken(req);
-
     const body = await req.json();
+
+    /* ================= REQUIRED ================= */
 
     if (
       !body.full_name ||
       !body.dob ||
       !body.gender_code ||
       !Array.isArray(body.parent_ids) ||
-      body.parent_ids.length === 0
+      body.parent_ids.length === 0 ||
+      !body.primary_contact
     ) {
       return error("Required fields missing", {}, 422);
     }
 
-    /* ✅ validate parents in ONE query */
+    /* ================= DOB ================= */
+
+    const dob = new Date(body.dob);
+    if (isNaN(dob.getTime())) {
+      return error("Invalid DOB", {}, 422);
+    }
+
+    /* ================= GENDER ================= */
+
+    const genderMap: Record<string, "M" | "F" | "O"> = {
+      M: "M",
+      F: "F",
+      O: "O",
+      Male: "M",
+      Female: "F",
+      Other: "O",
+    };
+
+    const gender_code = genderMap[body.gender_code];
+    if (!gender_code) {
+      return error("Invalid gender value", {}, 422);
+    }
+
+    /* ================= CLINIC ================= */
+
+    let preferred_clinic_id: mongoose.Types.ObjectId | undefined;
+
+    if (body.preferred_clinic_id?.trim()) {
+      if (!mongoose.Types.ObjectId.isValid(body.preferred_clinic_id)) {
+        return error("Invalid clinic id", {}, 422);
+      }
+      preferred_clinic_id = new mongoose.Types.ObjectId(body.preferred_clinic_id);
+    }
+
+    /* ================= PARENTS ================= */
+
     const parents = await ParentMaster.find({
       _id: { $in: body.parent_ids },
     }).select("_id");
@@ -135,7 +248,8 @@ export async function POST(req: Request) {
       return error("One or more parents not found", {}, 422);
     }
 
-    /* ✅ SAFE child_id generation */
+    /* ================= CHILD ID ================= */
+
     const lastChild = await ChildMaster.findOne()
       .sort({ createdAt: -1 })
       .select("child_id")
@@ -147,11 +261,13 @@ export async function POST(req: Request) {
 
     const child_id = `CHD${String(lastNumber + 1).padStart(5, "0")}`;
 
+    /* ================= CREATE ================= */
+
     const doc = await ChildMaster.create({
       child_id,
       full_name: body.full_name.trim(),
-      dob: new Date(body.dob),
-      gender_code: body.gender_code,
+      dob,
+      gender_code,
       blood_group_code: body.blood_group_code,
       birth_weight_kg: body.birth_weight_kg,
       birth_length_cm: body.birth_length_cm,
@@ -161,28 +277,23 @@ export async function POST(req: Request) {
       parent_ids: body.parent_ids,
       photo: body.photo,
       primary_contact: body.primary_contact,
-      preferred_clinic_id: body.preferred_clinic_id,
+      preferred_clinic_id,
       notes: body.notes,
-      consent_data_sharing: body.consent_data_sharing,
-      created_by: user.id, // 🔐 audit ready
+      consent_data_sharing: !!body.consent_data_sharing,
     });
 
     await ChildAuditLog.create({
-  child_id: doc._id,
-  action: "CREATE",
-  changed_by: user.id,
-  changed_by_role: user.role,
-  changes: {},
-});
-
+      child_id: doc._id,
+      action: "CREATE",
+      changed_by: user.id,
+      changed_by_role: user.role,
+      changes: {},
+    });
 
     return success("Child created", doc);
   } catch (e: any) {
-    return error(
-      e.message === "Unauthorized" ? "Unauthorized" : "Server error",
-      {},
-      e.message === "Unauthorized" ? 401 : 500
-    );
+    console.error("CREATE CHILD ERROR:", e);
+    return error("Server error", {}, 500);
   }
 }
 

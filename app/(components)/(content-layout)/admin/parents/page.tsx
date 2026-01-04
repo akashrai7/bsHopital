@@ -115,6 +115,20 @@ export default function ParentsListPage() {
 
   /* ================= render ================= */
 
+  const getKycBadge = (status?: string) => {
+  switch (status) {
+    case "verified":
+      return <span className="badge bg-success">Verified</span>;
+    case "otp_sent":
+      return <span className="badge bg-warning text-dark">OTP Sent</span>;
+    case "failed":
+      return <span className="badge bg-danger">Failed</span>;
+    default:
+      return <span className="badge bg-secondary">Not Started</span>;
+  }
+};
+
+
   return (
     <Fragment>
       <Seo title="Parents List" />
@@ -195,7 +209,8 @@ export default function ParentsListPage() {
                           <td>{p.aadhaar || "-"}</td>
                           <td>{p.address?.city || "-"}</td>
                           <td>{p.address?.district?.name || "-"}</td>
-                          <td>{p.address?.state?.name || "-"}</td>
+                          {/* <td>{p.address?.state?.name || "-"}</td> */}
+                          <td>{getKycBadge((parent as any)?.kyc?.status)}</td>
 <td>
   {Array.isArray(p.children) && p.children.length > 0 ? (
     <div className="d-flex flex-wrap gap-1">
@@ -205,7 +220,7 @@ export default function ParentsListPage() {
           bg="primary-gradient"
           style={{ cursor: "pointer" }}
           onClick={() =>
-            router.push(`/admin/children/profile?id=${c._id}`)
+            router.push(`/admin/children/profile-?id=${c._id}`)
           }
         >
           {c.full_name}
