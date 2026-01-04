@@ -250,7 +250,7 @@ export default function ParentsListPage() {
                               variant="success"
                               className="me-1"
                               onClick={() =>
-                                router.push(`/admin/parents/profile-?id=${p._id}`)
+                                router.push(`/admin/parents/detail?id=${p._id}`)
                               }
                             >
                               View

@@ -111,7 +111,9 @@ export default function ParentKycCard({ parent }: any) {
         <h5>KYC History</h5>
     </Card.Header>
     
-    <KycHistoryTable parentId={parent._id} />
+    {parent?._id && (
+  <KycHistoryTable parentId={parent._id} />
+    )}
   </Card.Body>
 </Card>
     </>
