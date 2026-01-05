@@ -11,11 +11,11 @@ export async function GET(
   try {
     await connectMongo();
 
-    const parentId = params.id;
+     const { id: parentId } = await params;
 
-    const history = await ParentKycRequest.find({ parentId })
-      .sort({ createdAt: -1 })
-      .lean();
+  const history = await ParentKycRequest.find({ parentId })
+    .sort({ createdAt: -1 })
+    .lean();
 
     return NextResponse.json(
       {

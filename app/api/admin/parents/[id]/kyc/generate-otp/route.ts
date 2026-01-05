@@ -17,12 +17,12 @@ export async function POST(
     await connectMongo();
 
     /* 1️⃣ parentId from URL */
-    const parentId = params.id;
+    const { id: parentId } = await params;
 
     /* 2️⃣ request body */
     const body = await req.json();
     const { aadhaar } = body;
-
+    console.log("AADHAAR RECEIVED:", aadhaar);
     if (!aadhaar) {
       return NextResponse.json(
         { message: "Aadhaar number is required" },
@@ -61,6 +61,11 @@ if (!limitCheck.allowed) {
       );
     }
 
+console.log("SENDING TO QUICKEKYC:", {
+  aadhaar,
+  key: process.env.QUICKEKYC_API_KEY
+});
+
     /* 5️⃣ QuickeKYC generate OTP */
     const response = await quickeKyc.post(
       "/api/v1/aadhaar-v2/generate-otp",
@@ -73,14 +78,16 @@ if (!limitCheck.allowed) {
     const requestId = (response as any)?.data?.request_id;
 
     if (!requestId) {
-      return NextResponse.json(
-        {
-          message: "Failed to generate OTP",
-          response: (response as any)?.data
-        },
-        { status: 400 }
-      );
-    }
+  console.error("QUICKEKYC OTP ERROR:", (response as any)?.data);
+
+  return NextResponse.json(
+    {
+      message: "QuickeKYC OTP failed",
+      quickekyc: (response as any)?.data
+    },
+    { status: 400 }
+  );
+}
 
     /* 6️⃣ Save KYC request */
     await ParentKycRequest.create({

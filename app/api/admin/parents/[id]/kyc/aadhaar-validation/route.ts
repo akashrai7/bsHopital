@@ -17,7 +17,7 @@ export async function POST(
 
    
     /* 1️⃣ parentId from URL */
-    const parentId = params.id;
+    const { id: parentId } = await params;
 
     /* 2️⃣ body se aadhaar nikalo */
     const body = await req.json();
