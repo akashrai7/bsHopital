@@ -66,9 +66,13 @@ export async function POST(
     /* 6️⃣ SUCCESS CASE */
     if (apiData?.status === "success") {
       await ParentKycRequest.findByIdAndUpdate(kycRequest._id, {
-        status: "verified",
-        responseRaw: apiData
-      });
+  status: "verified",
+  responseRaw: {
+    status: "success",
+    message: "OTP verified successfully"
+  },
+  errorMessage: null
+});
 
       await ParentMaster.findByIdAndUpdate(parentId, {
         "kyc.status": "verified",
@@ -91,17 +95,24 @@ export async function POST(
       errorMessage: apiData?.message || "OTP verification failed"
     });
 
-    await ParentMaster.findByIdAndUpdate(parentId, {
-      "kyc.status": "failed"
-    });
+    
+    if (parent.kyc?.status !== "verified") {
+  await ParentMaster.findByIdAndUpdate(parentId, {
+    "kyc.status": "failed"
+  });
+}
 
     return NextResponse.json(
       {
-        message: apiData?.message || "OTP verification failed",
-        data: apiData
+        message: apiData?.message || "OTP expired. Please request a new OTP.",
+        data: apiData,
+        code: "OTP_EXPIRED"
       },
       { status: 400 }
     );
+
+
+
   } catch (err: any) {
     console.error("VERIFY OTP ERROR:", err);
 

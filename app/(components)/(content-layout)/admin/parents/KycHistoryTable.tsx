@@ -59,7 +59,7 @@ export default function KycHistoryTable({ parentId }: Props) {
               </span>
             </td>
             <td>{row.provider}</td>
-            <td>{row.errorMessage || row.responseRaw?.message || "-"}</td>
+            <td>{row.status === "verified" ? "OTP verified successfully" : row.errorMessage || "OTP verification failed"} </td>
           </tr>
         ))}
       </tbody>
