@@ -145,7 +145,7 @@ export default function KycOtpModal({
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || "OTP verification failed");
+        toast.error(data.message || "OTP invalid or expired");
         setOtp("");
         return;
       }
@@ -161,25 +161,24 @@ export default function KycOtpModal({
       setLoading(false);
     }
 
+const [secondsLeft, setSecondsLeft] = useState(60);
 
-    const [secondsLeft, setSecondsLeft] = useState(60);
-
-    useEffect(() => {
+useEffect(() => {
   if (!show) return;
 
   setSecondsLeft(60);
 
-  const timer = setInterval(() => {
+  const interval = setInterval(() => {
     setSecondsLeft((prev) => {
       if (prev <= 1) {
-        clearInterval(timer);
+        clearInterval(interval);
         return 0;
       }
       return prev - 1;
     });
   }, 1000);
 
-  return () => clearInterval(timer);
+  return () => clearInterval(interval);
 }, [show]);
 
 

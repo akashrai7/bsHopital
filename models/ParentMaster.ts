@@ -85,6 +85,16 @@ const ParentMasterSchema = new Schema<IParentMaster>(
     admin_notes: { type: String, trim: true },
     created_by: { type: String, enum: ["admin", "self"], default: "self" },
     is_active: { type: Boolean, default: true },
+    kyc: {
+      status: {
+        type: String,
+        enum: ["not_started", "otp_sent", "verified", "failed"],
+        default: "not_started"
+      },
+      verifiedAt: { type: Date, default: null },
+      lastAttemptAt: { type: Date, default: null },
+      totalAttempts: { type: Number, default: 0 }
+    }
   },
   {
     timestamps: true,
