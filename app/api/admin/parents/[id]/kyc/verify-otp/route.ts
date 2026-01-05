@@ -16,7 +16,7 @@ export async function POST(
     await connectMongo();
 
     /* 1️⃣ parentId from URL */
-    const parentId = params.id;
+     const { id: parentId } = await params;
 
     /* 2️⃣ request body */
     const body = await req.json();
