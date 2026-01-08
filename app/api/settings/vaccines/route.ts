@@ -12,6 +12,7 @@ export async function GET() {
       .sort({ createdAt: -1 });
     return success("vaccine fetched", list);
   } catch (err) {
+    console.log("error", err);
     return error("Failed to fetch vaccines");
   }
 }
