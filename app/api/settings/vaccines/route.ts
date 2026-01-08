@@ -2,7 +2,9 @@ import { connectMongo } from "@/lib/mongoose";
 import VaccineMaster from "@/models/VaccineMaster";
 import { success, error } from "@/lib/response";
 
-export const runtime = "nodejs";
+import "@/models/WeekRangeMaster";
+import "@/models/DoseTypeMaster";
+import "@/models/VaccineSiteMaster";
 
 export async function GET() {
   try {
