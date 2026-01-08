@@ -119,16 +119,16 @@ export async function GET(req: Request) {
     });
 
     // revoke old token and mark replacedBy = new token id
-    await revokeRefreshToken(tokenDoc._id, /* replacedByTokenId */ null); // we can store replacedBy tokenId if needed
+    // await revokeRefreshToken(tokenDoc._id, /* replacedByTokenId */ null); // we can store replacedBy tokenId if needed
 
     // create new access token
     const newAccess = signAccessToken({ id: userId, role: "admin" });
 
     // set new cookies
-    const baseOptions = ["HttpOnly", "Path=/", "SameSite=Strict"];
+    const baseOptions = ["HttpOnly", "Path=/", "SameSite=Lax"];
     const refreshParts = [`refreshToken=${newRaw}`, ...baseOptions, `Max-Age=${7 * 24 * 60 * 60}`];
     const accessParts = [`accessToken=${newAccess}`, ...baseOptions, `Max-Age=${15 * 60}`];
-
+    
     if (process.env.NODE_ENV === "production") {
       refreshParts.push("Secure");
       accessParts.push("Secure");

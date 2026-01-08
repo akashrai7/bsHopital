@@ -56,8 +56,8 @@ const token = authHeader.split(" ")[1];
     const medical_registration_number = (body.medical_registration_number || "").trim();
     const registration_council = (body.registration_council || "").trim();
     const qualifications = (body.qualifications || "").trim();
-    const years_experience = (body.years_experience || "").trim();
-    const clinic_id = (body.clinic_id || "").trim();
+    const years_experience = body.years_experience !== undefined ? Number(body.years_experience) : undefined;
+    const clinic_id =  mongoose.Types.ObjectId.isValid(body.clinic_id) ? body.clinic_id : undefined;
     const specialty = body.specialty || null;
     const address = body.address || {};
     const profile_photo = body.profile_photo || null;
@@ -92,6 +92,7 @@ const token = authHeader.split(" ")[1];
     if (!registration_council) v.registration_council = "Registration council is required.";
     if (!qualifications) v.qualifications = "Qualifications is required.";
     if (!years_experience) v.years_experience = "Experience is required.";
+    
     if (!clinic_id) v.clinic_id = "Clinic id is required.";
 
     const hashed = await bcrypt.hash(passwordRaw, SALT_ROUNDS);

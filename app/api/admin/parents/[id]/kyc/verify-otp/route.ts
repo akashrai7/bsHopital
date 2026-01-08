@@ -67,10 +67,8 @@ export async function POST(
     if (apiData?.status === "success") {
       await ParentKycRequest.findByIdAndUpdate(kycRequest._id, {
   status: "verified",
-  responseRaw: {
-    status: "success",
-    message: "OTP verified successfully"
-  },
+  data: apiData,
+  responseRaw: apiData,
   errorMessage: null
 });
 

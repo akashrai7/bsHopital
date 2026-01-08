@@ -25,12 +25,12 @@ export interface IDoctorMaster extends Document {
   registration_council: string;
   qualifications: string;
   years_experience?: number;
-  clinic_id?: string;
+  clinic_id?: Types.ObjectId;
 
 
   address?: IDoctorAddress;
   profile_photo?: string;
-  license_document?: String;
+  license_document: String;
   consent_whatsapp?: boolean;
   consent_whatsapp_ts?: Date | null;
   consent_whatsapp_ip?: string | null;
@@ -65,7 +65,7 @@ const DoctorMasterSchema = new Schema<IDoctorMaster>(
     last_name: { type: String, required: true, trim: true },
     email: { type: String, trim: true, lowercase: true, index: true, sparse: true },
     phone: { type: String, required: true, unique: true, index: true }, // E.164
-    aadhaar: { type: String, trim: true, unique: true, sparse: true },
+    aadhaar: { type: String, unique: true, sparse: true },
     password: { type: String, required: true },
     preferred_language: { type: Schema.Types.ObjectId, ref: "LanguageMaster" },
     specialty: { type: Schema.Types.ObjectId, ref: "SpecialtiesMaster" },
@@ -90,10 +90,7 @@ const DoctorMasterSchema = new Schema<IDoctorMaster>(
       type: Number,
       min: 0,
     },
-    clinic_id: {
-      type: String,
-      trim: true,
-    },
+    clinic_id: { type: Schema.Types.ObjectId, ref: "ClinicMaster", },
     
     address: { type: DoctorAddressSchema },
     profile_photo: { type: String, trim: true },
@@ -113,11 +110,6 @@ const DoctorMasterSchema = new Schema<IDoctorMaster>(
     collection: "doctors",
   }
 );
-
-// indexes: (some are already declared above with unique/index)
-// doctorMasterSchema.index({ email: 1 }, { unique: true, sparse: true });
-// doctorMasterSchema.index({ phone: 1 }, { unique: true });
-// doctorMasterSchema.index({ aadhaar: 1 }, { unique: true, sparse: true });
 
 export default mongoose.models.DoctorMaster ||
   mongoose.model<IDoctorMaster>("DoctorMaster", DoctorMasterSchema);

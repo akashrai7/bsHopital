@@ -166,7 +166,7 @@ const [secondsLeft, setSecondsLeft] = useState(60);
 useEffect(() => {
   if (!show) return;
 
-  setSecondsLeft(60);
+  setSecondsLeft(45);
 
   const interval = setInterval(() => {
     setSecondsLeft((prev) => {

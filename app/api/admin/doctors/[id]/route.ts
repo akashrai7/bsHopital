@@ -1,7 +1,7 @@
 // /app/api/admin/doctors/[id]/route.ts
 import { connectMongo } from "@/lib/mongoose";
 import DoctorMaster from "@/models/DoctorMaster";
-import SpecialtiesMaster from "@/models/SpecialtiesMaster";
+// import SpecialtiesMaster from "@/models/SpecialtiesMaster";
 import { success, error } from "@/lib/response";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
@@ -131,9 +131,11 @@ export async function PUT(req: Request, context: { params: any }) {
     if (typeof body.medical_registration_number === "string") updates.medical_registration_number = body.medical_registration_number.trim();
     if (typeof body.registration_council === "string") updates.registration_council = body.registration_council.trim();
     if (typeof body.qualifications === "string") updates.qualifications = body.qualifications.trim();
-    if (typeof body.years_experience === "string") updates.years_experience = body.years_experience.trim();
-    if (typeof body.clinic_id === "string") updates.clinic_id = body.clinic_id.trim();
-
+    // if (typeof body.years_experience === "string") updates.years_experience = body.years_experience.trim();
+    if (body.years_experience !== undefined) { const n = Number(body.years_experience);
+    if (!Number.isNaN(n)) updates.years_experience = n; }
+    // if (typeof body.clinic_id === "string") updates.clinic_id = body.clinic_id.trim();
+    if (typeof body.clinic_id === "string" && mongoose.Types.ObjectId.isValid(body.clinic_id)) { updates.clinic_id = body.clinic_id; }
     if (body.address && typeof body.address === "object") updates.address = body.address;
     if (typeof body.profile_photo === "string") updates.profile_photo = body.profile_photo || undefined;
     if (typeof body.license_document === "string") updates.license_document = body.license_document || undefined;
@@ -152,7 +154,7 @@ export async function PUT(req: Request, context: { params: any }) {
       const hashed = await bcrypt.hash(body.password, SALT_ROUNDS);
       updates.password = hashed;
     }
-
+    
     const v: Record<string, string> = {};
     if (updates.email && !/^\S+@\S+\.\S+$/.test(updates.email)) v.email = "Invalid email format.";
     if (updates.aadhaar && !/^\d{12}$/.test(updates.aadhaar)) v.aadhaar = "Aadhaar must be 12 digits.";

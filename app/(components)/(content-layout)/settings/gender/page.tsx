@@ -206,7 +206,7 @@ export default function GenderPage() {
       <Pageheader title="Settings" currentpage="Genders" activepage="Gender" />
 
       <Row>
-        <Col xl={6}>
+        <Col xxl={6}>
           <Card className="custom-card">
             <Card.Header>
               <Card.Title>{editingId ? "Edit Gender" : "Add Gender"}</Card.Title>
@@ -243,7 +243,7 @@ export default function GenderPage() {
           </Card>
         </Col>
 
-        <Col xl={6}>
+        <Col xxl={6}>
           <Card className="custom-card">
             <Card.Header>
               <Card.Title>Gender List</Card.Title>

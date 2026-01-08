@@ -1,3 +1,4 @@
+// admin/doctor/add/page.tsx
 "use client";
 
 import React, { Fragment, useEffect, useState } from "react";
@@ -89,7 +90,7 @@ export default function AdminAddEditDoctorPage() {
       const relRes = await fetch("/api/settings/specialties");
       const relJson = await relRes.json();
       if (relJson?.status) {
-        setSpecialty((relJson.data || []).map((r: any) => ({ value: r._id, label: `${r.name} (${r.code || ""})` })));
+        setSpecialty((relJson.data || []).map((r: any) => ({ value: r._id, label: `${r.name}` })));
       }
 
       // countries
@@ -419,7 +420,7 @@ export default function AdminAddEditDoctorPage() {
         registration_council: form.registration_council,
         qualifications: form.qualifications,   
         years_experience: form.years_experience,
-        clinic_id: form.clinic_id,
+        clinic_id: form.clinic_id || undefined,
         address: {
           line1: form.address.line1,
           line2: form.address.line2,
@@ -499,10 +500,16 @@ function onLicenseChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev: any) => ({ ...prev, license_document_file: file, license_document: file ? "" : prev.license_document }));
   }
 
+function toTitleCase(str: string = "") {
+  return str
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
   return (
     <Fragment>
       <Seo title={editId ? "Edit Doctor" : "Add Doctor"} />
-      <Pageheader title="Doctors" currentpage={editId ? "Edit Doctor" : "Add Doctor"} activepage="add" />
+      <Pageheader title="Add Doctors" currentpage={editId ? "Edit Doctor" : "Add Doctor"} activepage="Doctors" />
 
       <Row>
         <Col xl={12}>
@@ -727,7 +734,7 @@ function onLicenseChange(e: React.ChangeEvent<HTMLInputElement>) {
                       <option value="">Select Country</option>
                       {countries.map((c) => (
                         <option key={c._id} value={c._id}>
-                          {c.name} ({c.code})
+                          {c.name} 
                         </option>
                       ))}
                     </Form.Select>
@@ -743,7 +750,7 @@ function onLicenseChange(e: React.ChangeEvent<HTMLInputElement>) {
                       <option value="">{form.address.country ? "Select State" : "Select Country first"}</option>
                       {states.map((s) => (
                         <option key={s._id} value={s._id}>
-                          {s.name} ({s.code})
+                          {toTitleCase(s.name)}
                         </option>
                       ))}
                     </Form.Select>
@@ -759,7 +766,7 @@ function onLicenseChange(e: React.ChangeEvent<HTMLInputElement>) {
                       <option value="">{form.address.state ? "Select District" : "Select State first"}</option>
                       {districts.map((d) => (
                         <option key={d._id} value={d._id}>
-                          {d.name} ({d.code})
+                          {toTitleCase(d.name)}
                         </option>
                       ))}
                     </Form.Select>

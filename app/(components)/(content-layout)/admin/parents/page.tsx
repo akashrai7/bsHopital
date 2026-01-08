@@ -178,6 +178,7 @@ export default function ParentsListPage() {
                       <th>City</th>
                       <th>District</th>
                       <th>State</th>
+                      <th>Aadhaar Status</th>
                       <th style={{ width: 160 }}>Child Name</th>
                       <th style={{ width: 220 }}>Actions</th>
                     </tr>
@@ -186,13 +187,13 @@ export default function ParentsListPage() {
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan={11} className="text-center">
+                        <td colSpan={12} className="text-center">
                           Loading...
                         </td>
                       </tr>
                     ) : paginated.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="text-center">
+                        <td colSpan={12} className="text-center">
                           No records
                         </td>
                       </tr>
@@ -209,8 +210,8 @@ export default function ParentsListPage() {
                           <td>{p.aadhaar || "-"}</td>
                           <td>{p.address?.city || "-"}</td>
                           <td>{p.address?.district?.name || "-"}</td>
-                          {/* <td>{p.address?.state?.name || "-"}</td> */}
-                          <td>{getKycBadge((parent as any)?.kyc?.status)}</td>
+                          <td>{p.address?.state?.name || "-"}</td>
+                          <td>{getKycBadge(p?.kyc?.status)}</td>
 <td>
   {Array.isArray(p.children) && p.children.length > 0 ? (
     <div className="d-flex flex-wrap gap-1">
