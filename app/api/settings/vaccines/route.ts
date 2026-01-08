@@ -2,21 +2,25 @@ import { connectMongo } from "@/lib/mongoose";
 import VaccineMaster from "@/models/VaccineMaster";
 import { success, error } from "@/lib/response";
 
+export const runtime = "nodejs";
+
 export async function GET() {
   try {
     await connectMongo();
+
     const list = await VaccineMaster.find()
       .populate("week_range_id", "title start_week end_week")
       .populate("dose_type_id", "name code")
       .populate("vaccine_site_id", "name")
       .sort({ createdAt: -1 });
-    return success("vaccine fetched", list);
-  } catch (err) {
-    console.log("error", err);
+
+    // return success(list, "Vaccine fetched");
+    return success("Vaccine fetched", list);
+  } catch (err: any) {
+      console.error("GET vaccine list", err);
     return error("Failed to fetch vaccines");
   }
 }
-
 
 export async function POST(req: Request) {
   try {
