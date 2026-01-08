@@ -13,7 +13,7 @@ export async function GET() {
       .sort({ createdAt: -1 });
 
     // return success(list);
-    return success(list);
+    return success("Fetched vaccine", list);
   } catch {
     return error("Failed to fetch vaccines");
   }
