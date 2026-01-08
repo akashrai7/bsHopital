@@ -5,19 +5,13 @@ import { success, error } from "@/lib/response";
 export async function GET() {
   try {
     await connectMongo();
-
-    const list = await VaccineMaster.find()
-      .populate("week_range_id", "title start_week end_week")
-      .populate("dose_type_id", "name code")
-      .populate("vaccine_site_id", "name")
-      .sort({ createdAt: -1 });
-
-    // return success(list);
-    return success("Fetched vaccine", list);
-  } catch {
+    const list = await VaccineMaster.find();
+    return success("vaccine fetched", list);
+  } catch (err) {
     return error("Failed to fetch vaccines");
   }
 }
+
 
 export async function POST(req: Request) {
   try {
