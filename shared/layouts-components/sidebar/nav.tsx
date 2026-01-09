@@ -48,6 +48,7 @@ export const MENUITEMS: any = [
       },
       {
         title: "Vaccine Settings", type: "sub", icon: Svgicons.Profilesettingicon, active: false, children: [
+          { path: "/settings/vaccine-brands/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccines Brands" },
           { path: "/settings/vaccines/", type: "link", active: false, selected: false, dirchange: false, title: "Vaccines" },
           { path: "/settings/week-range/", type: "link", active: false, selected: false, dirchange: false, title: "Week Range" },
           { path: "/settings/routes-of-administration/", type: "link", active: false, selected: false, dirchange: false, title: "Routes of administration" },

@@ -217,7 +217,7 @@ export default function VaccineManufacturerPage() {
                   <SpkButton
                     Buttontype="submit"
                     Customclass="btn btn-primary"
-                    disabled={submitting}
+                    Disabled={submitting}
                   >
                     {submitting
                       ? editingId

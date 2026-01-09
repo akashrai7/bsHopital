@@ -11,5 +11,6 @@ import "./SpecialtiesMaster";
 import "./WeekRangeMaster";
 import "./DoseTypeMaster";
 import "./VaccineSiteMaster";
+import "./VaccineMaster";
 // ... add other master models you have
 // No export needed — we just want side-effectful imports
