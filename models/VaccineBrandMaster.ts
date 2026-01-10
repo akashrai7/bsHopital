@@ -2,13 +2,13 @@ import mongoose, { Schema, models, model } from "mongoose";
 
 const VaccineBrandSchema = new Schema(
   {
-    brand_code: {
-      type: String,
+    vaccine_id: {
+      type: Schema.Types.ObjectId,
+      ref: "VaccineMaster",
       required: true,
-      unique: true,
-      trim: true,
-      uppercase: true,
     },
+
+    
 
     brand_name: {
       type: String,

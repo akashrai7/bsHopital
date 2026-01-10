@@ -15,7 +15,7 @@ type OptionItem = {
 
 type BrandItem = {
   _id: string;
-  brand_code: string;
+  vaccine_id: { _id: string; name: string; code: string; };
   brand_name: string;
   manufacturer_id: { _id: string; name: string };
   dosage_form_id: { _id: string; name: string };
@@ -31,13 +31,14 @@ export default function VaccineBrandPage() {
   const [submitting, setSubmitting] = useState(false);
 
   // dropdown masters
+  const [vaccines, setVaccine] = useState<OptionItem[]>([]);
   const [manufacturers, setManufacturers] = useState<OptionItem[]>([]);
   const [doseTypes, setDoseTypes] = useState<OptionItem[]>([]);
   const [storages, setStorages] = useState<OptionItem[]>([]);
 
   // form (add + edit)
   const [form, setForm] = useState({
-    brand_code: "",
+    vaccine_id: "",
     brand_name: "",
     manufacturer_id: "",
     antigen_composition: "",
@@ -64,12 +65,14 @@ function extractList(res: any): any[] {
 }
   async function fetchMasters() {
   try {
-    const [m, d, s] = await Promise.all([
+    const [v, m, d, s] = await Promise.all([
+      fetch("/api/settings/vaccines").then(r => r.json()),
       fetch("/api/settings/vaccine-manufacturers").then(r => r.json()),
       fetch("/api/settings/dose-types").then(r => r.json()),
       fetch("/api/settings/vaccine-storage-conditions").then(r => r.json()),
     ]);
 
+    setVaccine(extractList(v));
     setManufacturers(extractList(m));
     setDoseTypes(extractList(d));
     setStorages(extractList(s));
@@ -108,7 +111,7 @@ console.log("Storages:", s);
 
   function validate() {
     const e: any = {};
-    if (!form.brand_code.trim()) e.brand_code = "Brand code required";
+    if (!form.vaccine_id.trim()) e.vaccine_id = "Vaccines required";
     if (!form.brand_name.trim()) e.brand_name = "Brand name required";
     if (!form.manufacturer_id) e.manufacturer_id = "Manufacturer required";
     if (!form.dosage_form_id) e.dosage_form_id = "Dosage form required";
@@ -147,7 +150,7 @@ console.log("Storages:", s);
       } else {
         toast.success(editingId ? "Brand updated" : "Brand added");
         setForm({
-          brand_code: "",
+          vaccine_id: "",
           brand_name: "",
           manufacturer_id: "",
           antigen_composition: "",
@@ -168,7 +171,7 @@ console.log("Storages:", s);
 
   function handleEdit(item: BrandItem) {
     setForm({
-      brand_code: item.brand_code,
+      vaccine_id: item.vaccine_id._id,
       brand_name: item.brand_name,
       manufacturer_id: item.manufacturer_id._id,
       antigen_composition: "",
@@ -195,8 +198,8 @@ console.log("Storages:", s);
   const filtered = useMemo(() => {
     return list.filter(
       (b) =>
-        b.brand_name.toLowerCase().includes(search.toLowerCase()) ||
-        b.brand_code.toLowerCase().includes(search.toLowerCase())
+        b.brand_name.toLowerCase().includes(search.toLowerCase()) 
+        // || b.vaccine_id.toLowerCase().includes(search.toLowerCase())
     );
   }, [list, search]);
 
@@ -216,7 +219,7 @@ console.log("Storages:", s);
 
       <Row>
         {/* FORM */}
-        <Col xl={6}>
+        <Col xl={4}>
           <Card className="custom-card">
             <Card.Header>
               <Card.Title>
@@ -225,16 +228,24 @@ console.log("Storages:", s);
             </Card.Header>
             <Card.Body>
               <form onSubmit={handleSubmit}>
-                <Form.Control
+                <Form.Label>Vaccine *</Form.Label>
+                <Form.Select
                   className="mb-2"
-                  placeholder="Brand Code"
-                  value={form.brand_code}
+                  value={form.vaccine_id}
                   onChange={(e) =>
-                    setForm({ ...form, brand_code: e.target.value })
+                    setForm({ ...form, vaccine_id: e.target.value })
                   }
-                  isInvalid={!!errors.brand_code}
-                />
+                  isInvalid={!!errors.vaccine_id}
+                >
+                  <option value="">Select Vaccine</option>
+                  {vaccines.map((v) => (
+                    <option key={v._id} value={v._id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </Form.Select>
 
+                  <Form.Label>Brand Name *</Form.Label>
                 <Form.Control
                   className="mb-2"
                   placeholder="Brand Name"
@@ -245,6 +256,7 @@ console.log("Storages:", s);
                   isInvalid={!!errors.brand_name}
                 />
 
+                  <Form.Label>Manufacturer *</Form.Label>
                 <Form.Select
                   className="mb-2"
                   value={form.manufacturer_id}
@@ -260,7 +272,7 @@ console.log("Storages:", s);
                     </option>
                   ))}
                 </Form.Select>
-
+                  <Form.Label>Antigen Composition (optional)</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={2}
@@ -274,7 +286,7 @@ console.log("Storages:", s);
                     })
                   }
                 />
-
+                 <Form.Label>Dosage Form</Form.Label>
                 <Form.Select
                   className="mb-2"
                   value={form.dosage_form_id}
@@ -290,17 +302,21 @@ console.log("Storages:", s);
                     </option>
                   ))}
                 </Form.Select>
-
-                <Form.Control
+                  <Form.Label>Vial Type</Form.Label>
+                <Form.Select
                   className="mb-2"
-                  placeholder="Vial Type (Single / Multi-dose)"
                   value={form.vial_type}
                   onChange={(e) =>
                     setForm({ ...form, vial_type: e.target.value })
                   }
                   isInvalid={!!errors.vial_type}
-                />
+                >
+                  <option value="">Select Vial Type</option>
+                  <option value="Single">Single</option>
+                  <option value="Multi-dose">Multi-dose</option>
+                </Form.Select>
 
+                <Form.Label>Storage Condition</Form.Label>
                 <Form.Select
   value={form.storage_condition_id}
   onChange={(e) =>
@@ -335,7 +351,7 @@ console.log("Storages:", s);
         </Col>
 
         {/* TABLE */}
-        <Col xl={6}>
+        <Col xl={8}>
           <Card className="custom-card">
             <Card.Header>
               <Card.Title>Vaccine Brand List</Card.Title>
@@ -352,6 +368,7 @@ console.log("Storages:", s);
                   <tr>
                     <th>#</th>
                     <th>Brand</th>
+                    <th>Vaccine</th>
                     <th>Manufacturer</th>
                     <th>Dosage</th>
                     <th>Vial</th>
@@ -378,9 +395,9 @@ console.log("Storages:", s);
                         <td>{(page - 1) * perPage + i + 1}</td>
                         <td>
                           {b.brand_name}
-                          <div className="text-muted fs-11">
-                            {b.brand_code}
-                          </div>
+                        </td>
+                        <td>
+                            {b.vaccine_id.name}
                         </td>
                         <td>{b.manufacturer_id.name}</td>
                         <td>{b.dosage_form_id.name}</td>

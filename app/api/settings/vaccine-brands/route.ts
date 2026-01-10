@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const doc = await VaccineBrandMaster.create({
-      brand_code: body.brand_code?.trim(),
+      vaccine_id: body.vaccine_id,
       brand_name: body.brand_name?.trim(),
       manufacturer_id: body.manufacturer_id,
       antigen_composition: body.antigen_composition || "",
@@ -31,6 +31,7 @@ export async function GET() {
   try {
     await connectMongo();
     const list = await VaccineBrandMaster.find()
+      .populate("vaccine_id", "name")
       .populate("manufacturer_id", "name")
       .populate("dosage_form_id", "name")
       .populate("storage_condition_id", "name")

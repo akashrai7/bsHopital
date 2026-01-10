@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: Params) {
     const doc = await VaccineBrandMaster.findByIdAndUpdate(
       id,
       {
-        brand_code: body.brand_code?.trim(),
+        vaccine_id: body.vaccine_id,
         brand_name: body.brand_name?.trim(),
         manufacturer_id: body.manufacturer_id,
         antigen_composition: body.antigen_composition || "",
