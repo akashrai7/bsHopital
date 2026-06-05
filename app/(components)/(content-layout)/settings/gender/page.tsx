@@ -265,8 +265,8 @@ async function getCategories() {
 
 {categories.map((category) => (
   <div key={category.id}>
-    <h4>{category.name}</h4>
-    <p>{category.slug}</p>
+    <h4>Category- {category.name}</h4>
+    <p>Slug- {category.slug}</p>
   </div>
 ))}
               </div>
