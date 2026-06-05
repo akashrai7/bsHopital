@@ -228,7 +228,7 @@ console.log("Storages:", s);
             </Card.Header>
             <Card.Body>
               <form onSubmit={handleSubmit}>
-                <Form.Label>Vaccine *</Form.Label>
+                <Form.Label>Vaccine For *</Form.Label>
                 <Form.Select
                   className="mb-2"
                   value={form.vaccine_id}
@@ -286,7 +286,7 @@ console.log("Storages:", s);
                     })
                   }
                 />
-                 <Form.Label>Dosage Form</Form.Label>
+                 <Form.Label>Dosage Form *</Form.Label>
                 <Form.Select
                   className="mb-2"
                   value={form.dosage_form_id}
@@ -302,7 +302,7 @@ console.log("Storages:", s);
                     </option>
                   ))}
                 </Form.Select>
-                  <Form.Label>Vial Type</Form.Label>
+                  <Form.Label>Vial Type *</Form.Label>
                 <Form.Select
                   className="mb-2"
                   value={form.vial_type}
@@ -316,7 +316,7 @@ console.log("Storages:", s);
                   <option value="Multi-dose">Multi-dose</option>
                 </Form.Select>
 
-                <Form.Label>Storage Condition</Form.Label>
+                <Form.Label>Storage Condition *</Form.Label>
                 <Form.Select
   value={form.storage_condition_id}
   onChange={(e) =>
@@ -379,13 +379,13 @@ console.log("Storages:", s);
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={7} className="text-center">
+                      <td colSpan={8} className="text-center">
                         Loading...
                       </td>
                     </tr>
                   ) : paginated.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center">
+                      <td colSpan={8} className="text-center">
                         No records found
                       </td>
                     </tr>
@@ -393,28 +393,20 @@ console.log("Storages:", s);
                     paginated.map((b, i) => (
                       <tr key={b._id}>
                         <td>{(page - 1) * perPage + i + 1}</td>
-                        <td>
-                          {b.brand_name}
-                        </td>
-                        <td>
-                            {b.vaccine_id.name}
-                        </td>
+                        <td>{b.brand_name}</td>
+                        <td>{b.vaccine_id.name}</td>
                         <td>{b.manufacturer_id.name}</td>
                         <td>{b.dosage_form_id.name}</td>
                         <td>{b.vial_type}</td>
                         <td>{b.is_active ? "Active" : "Inactive"}</td>
-                        <td>
-                          <button
+                        <td><button
                             className="btn btn-sm btn-outline-primary me-1"
                             onClick={() => handleEdit(b)}
-                          >
-                            Edit
-                          </button>
+                          > Edit </button>
                           <button
                             className="btn btn-sm btn-outline-danger"
                             onClick={() => handleDelete(b)}
-                          >
-                            Delete
+                          > Delete
                           </button>
                         </td>
                       </tr>

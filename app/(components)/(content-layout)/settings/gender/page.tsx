@@ -70,7 +70,7 @@ import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
 import { Card, Col, Form, Row, Table, InputGroup } from "react-bootstrap";
 import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 // import { layout1, layout10, layout11, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9 } from "@/shared/data/prism-code/forms-prism";
 import ShowCode from "@/shared/layouts-components/showcode/showcode";
 
@@ -91,25 +91,44 @@ export default function GenderPage() {
   const [errors, setErrors] = useState<{ name?: string; auth?: string }>({});
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // fetch list
-  async function fetchList() {
+// test jaivik roos 
+ async function fetchList() {
     setLoading(true);
     try {
-      const res = await fetch("/api/settings/genders", { method: "GET" });
+      const res = await fetch("https://aharnish.com/wp-json/wp/v2/services", { method: "GET" });
       const data = await res.json();
       if (!data?.status) {
-        toast.error(data?.message || "Failed to fetch genders");
+        toast.error(data?.message || "Failed to fetch jaivik data");
         setList([]);
       } else {
         setList(Array.isArray(data.data) ? data.data : data.data.items || []);
       }
     } catch (err) {
-     // console.error("Fetch genders error:", err);
-      toast.error("Server error while fetching genders");
+      toast.error("Server error while fetching jaivik");
     } finally {
       setLoading(false);
     }
   }
+
+  // fetch list
+  // async function fetchList() {
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetch("/api/settings/genders", { method: "GET" });
+  //     const data = await res.json();
+  //     if (!data?.status) {
+  //       toast.error(data?.message || "Failed to fetch genders");
+  //       setList([]);
+  //     } else {
+  //       setList(Array.isArray(data.data) ? data.data : data.data.items || []);
+  //     }
+  //   } catch (err) {
+  //    // console.error("Fetch genders error:", err);
+  //     toast.error("Server error while fetching genders");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   useEffect(() => {
     fetchList();
@@ -291,6 +310,54 @@ export default function GenderPage() {
         </Col>
       </Row>
 
+<Row>
+  <Col xxl={12}>
+  <Card className="custom-card">
+            <Card.Header>
+              <Card.Title>Gender List</Card.Title>
+            </Card.Header>
+            <Card.Body>
+              <div className="table-responsive">
+                <Table striped bordered hover size="sm" className="mb-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={4} className="text-center">Loading...</td>
+                      </tr>
+                    ) : list.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="text-center">No records found</td>
+                      </tr>
+                    ) : (
+                      list.map((item, idx) => (
+                        <tr key={item._id}>
+                          <td>{idx + 1}</td>
+                          <td>{item.name}</td>
+                          <td>{item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}</td>
+                          <td>
+                            <div className="d-flex gap-2">
+                              <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(item)}>Edit</button>
+                              <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(item)}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </Table>
+              </div>
+            </Card.Body>
+          </Card>
+  </Col>
+</Row>
       <ToastContainer position="top-right" autoClose={2000} />
     </Fragment>
   );
