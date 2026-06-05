@@ -1,67 +1,3 @@
-// "use client"
-
-// import StickyHeadTable, { CustomizedTables, DataTabless, Deletetable, ExportCSV } from "@/shared/data/tables/tablesdata";
-// import Pageheader from "@/shared/layouts-components/pageheader/pageheader";
-// import Seo from "@/shared/layouts-components/seo/seo";
-// import React, { Fragment } from "react";
-// import { Card, Col, Form, InputGroup, Row } from "react-bootstrap";
-
-// import SpkButton from "@/shared/@spk-reusable-components/general-reusable/reusable-uielements/spk-buttons";
-// import { layout1, layout10, layout11, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9 } from "@/shared/data/prism-code/forms-prism";
-// import ShowCode from "@/shared/layouts-components/showcode/showcode";
-
-// interface DataTablesProps { }
-
-// const DataTables: React.FC<DataTablesProps> = () => {
-
-//     return (
-
-//         <Fragment>
-
-//             <Seo title="Data Tables" />
-
-//             <Pageheader title="Tables" currentpage="Data Tables" activepage="Data Tables" />
-
-//             {/* <!-- Start:: row-2 --> */}
-
-//             <Row>
-//                 <Col xl={4}>
-//                     <ShowCode title="Vertical Forms" customCardClass="custom-card" customCardBodyClass="" reactCode={layout1}>
-//                         <div className="mb-3">
-//                             <Form.Label htmlFor="form-text" className=" fs-14 text-dark">Enter name</Form.Label>
-//                             <Form.Control type="text" className="" id="form-text" placeholder="Full name" />
-//                         </div>
-//                             <div className="mb-3">
-//                                 <Form.Label htmlFor="form-password" className="fs-14 text-dark">Enter Password</Form.Label>
-//                                 <Form.Control type="password" className="" id="form-password" placeholder="password" />
-//                             </div>
-//                                         <Form.Check className="mb-3" type="checkbox" value="" id="invalidCheck" label="Accept Policy" required />
-//                                         <SpkButton Buttonvariant='primary' Buttontype="submit">Submit</SpkButton>
-//                     </ShowCode>
-//                 </Col>
-//                 <Col xl={8}>
-//                     <Card className="custom-card">
-//                         <Card.Header>
-//                             <Card.Title> Export Table </Card.Title>
-//                         </Card.Header>
-//                         <Card.Body>
-//                             <ExportCSV />
-//                         </Card.Body>
-//                     </Card>
-//                 </Col>
-//             </Row>
-
-//             {/* <!-- End:: row-2 --> */}
-
-    
-
-//         </Fragment>
-//     )
-// };
-
-// export default DataTables;
-
-// /app/(your-path)/gender/page.tsx
 "use client";
 
 import React, { Fragment, useEffect, useState } from "react";
@@ -81,6 +17,13 @@ type GenderItem = {
   updatedAt?: string;
 };
 
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  count: number;
+};
+
 export default function GenderPage() {
   const [list, setList] = useState<GenderItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,43 +35,42 @@ export default function GenderPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
 // test jaivik roos 
- async function fetchList() {
+ const [categories, setCategories] = useState<any[]>([]);
+
+async function getCategories() {
+  try {
+    const res = await fetch(
+      "https://jaivikroots.in/wp-json/wp/v2/categories"
+    );
+
+    const data = await res.json();
+
+    setCategories(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+  // fetch list
+  async function fetchList() {
     setLoading(true);
     try {
-      const res = await fetch("https://aharnish.com/wp-json/wp/v2/services", { method: "GET" });
+      const res = await fetch("/api/settings/genders", { method: "GET" });
       const data = await res.json();
       if (!data?.status) {
-        toast.error(data?.message || "Failed to fetch jaivik data");
+        toast.error(data?.message || "Failed to fetch genders");
         setList([]);
       } else {
         setList(Array.isArray(data.data) ? data.data : data.data.items || []);
       }
     } catch (err) {
-      toast.error("Server error while fetching jaivik");
+     // console.error("Fetch genders error:", err);
+      toast.error("Server error while fetching genders");
     } finally {
       setLoading(false);
     }
   }
-
-  // fetch list
-  // async function fetchList() {
-  //   setLoading(true);
-  //   try {
-  //     const res = await fetch("/api/settings/genders", { method: "GET" });
-  //     const data = await res.json();
-  //     if (!data?.status) {
-  //       toast.error(data?.message || "Failed to fetch genders");
-  //       setList([]);
-  //     } else {
-  //       setList(Array.isArray(data.data) ? data.data : data.data.items || []);
-  //     }
-  //   } catch (err) {
-  //    // console.error("Fetch genders error:", err);
-  //     toast.error("Server error while fetching genders");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
 
   useEffect(() => {
     fetchList();
@@ -314,45 +256,18 @@ export default function GenderPage() {
   <Col xxl={12}>
   <Card className="custom-card">
             <Card.Header>
-              <Card.Title>Gender List</Card.Title>
+              <Card.Title>Jaivik Roots</Card.Title>
             </Card.Header>
             <Card.Body>
-              <div className="table-responsive">
-                <Table striped bordered hover size="sm" className="mb-0">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Name</th>
-                      <th>Created</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loading ? (
-                      <tr>
-                        <td colSpan={4} className="text-center">Loading...</td>
-                      </tr>
-                    ) : list.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="text-center">No records found</td>
-                      </tr>
-                    ) : (
-                      list.map((item, idx) => (
-                        <tr key={item._id}>
-                          <td>{idx + 1}</td>
-                          <td>{item.name}</td>
-                          <td>{item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(item)}>Edit</button>
-                              <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(item)}>Delete</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </Table>
+              <div >
+               <h1>Our Categories</h1>
+
+{categories.map((category) => (
+  <div key={category.id}>
+    <h4>{category.name}</h4>
+    <p>{category.slug}</p>
+  </div>
+))}
               </div>
             </Card.Body>
           </Card>
