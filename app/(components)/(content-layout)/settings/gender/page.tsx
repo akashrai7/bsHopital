@@ -44,7 +44,7 @@ async function getCategories() {
     );
 
     const data = await res.json();
-
+    console.log("Categories:", data);
     setCategories(data);
   } catch (error) {
     console.log(error);
@@ -74,6 +74,7 @@ async function getCategories() {
 
   useEffect(() => {
     fetchList();
+    getCategories();
   }, []);
 
   function validate(): boolean {
@@ -256,11 +257,11 @@ async function getCategories() {
   <Col xxl={12}>
   <Card className="custom-card">
             <Card.Header>
-              <Card.Title>Jaivik Roots</Card.Title>
+              <Card.Title>Our Categories For Jaivik Roots</Card.Title>
             </Card.Header>
             <Card.Body>
               <div >
-               <h1>Our Categories</h1>
+              
 
 {categories.map((category) => (
   <div key={category.id}>
